@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -23,11 +24,11 @@ public class PingEventListener {
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.ping.queue}")
-    public void receiveMessage(String message) {
+    public void receiveMessage(Message<PingEvent> message) {
         logger.info("I'm here!!! Your message: {}", message);
         final var entity = new PingEntity();
         entity.setPingDateTime(LocalDateTime.now());
-        entity.setMessage(message);
+        entity.setMessage(message.getPayload().getBody());
         repository.save(entity);
         logger.info("Pings so far: {}", repository.findAll());
         eventSender.send(entity.toString());
