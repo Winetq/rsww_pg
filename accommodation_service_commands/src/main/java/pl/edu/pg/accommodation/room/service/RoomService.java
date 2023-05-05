@@ -36,8 +36,4 @@ public class RoomService {
     public Optional<RoomEntity> findRoom(final Long roomId) {
         return roomRepository.findById(roomId);
     }
-
-    public Optional<RoomEntity> findRoomByRoomNumber(final String roomNumber) {
-        return roomRepository.findRoomEntityByRoomNumber(roomNumber);
-    }
 }

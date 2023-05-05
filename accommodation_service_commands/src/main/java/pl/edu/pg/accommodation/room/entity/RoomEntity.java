@@ -8,62 +8,41 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.hibernate.Hibernate;
 import pl.edu.pg.accommodation.hotel.entity.HotelEntity;
 
+import java.util.Objects;
+
+@Getter
+@Setter
+@RequiredArgsConstructor
+@Builder
 @Entity
 @Table(name = "Rooms")
+@AllArgsConstructor
 public class RoomEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "id", nullable = false)
     private Long id;
+
     private int capacity;
+
     private float price;
-    private String roomNumber;
+
+    private String name;
+
+    private String features;
+
     @ManyToOne
     @JoinColumn(name = "hotelId", nullable = false)
     private HotelEntity hotel;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
-    }
-
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-    public String getRoomNumber() {
-        return roomNumber;
-    }
-
-    public void setRoomNumber(String roomNumber) {
-        this.roomNumber = roomNumber;
-    }
-
-    public HotelEntity getHotel() {
-        return hotel;
-    }
-
-    public void setHotel(HotelEntity hotel) {
-        this.hotel = hotel;
-    }
 
     @Override
     public String toString() {
@@ -71,8 +50,21 @@ public class RoomEntity {
                 "id=" + id +
                 ", capacity=" + capacity +
                 ", price=" + price +
-                ", roomNumber='" + roomNumber + '\'' +
+                ", name='" + name + '\'' +
                 ", hotel=" + hotel +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        RoomEntity that = (RoomEntity) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

@@ -5,14 +5,25 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import pl.edu.pg.accommodation.room.entity.RoomEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.Hibernate;
 
-import java.util.Set;
+import java.util.Objects;
 
+@Getter
+@Setter
+@ToString
+@Builder
+@RequiredArgsConstructor
 @Entity
 @Table(name = "Hotels")
+@AllArgsConstructor
 public class HotelEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -22,55 +33,21 @@ public class HotelEntity {
     private String country;
     private String city;
     private int stars;
+    private String description;
+    private String photo;
+    private String airport;
+    private String food;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    public int getStars() {
-        return stars;
-    }
-
-    public void setStars(int stars) {
-        this.stars = stars;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        HotelEntity that = (HotelEntity) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override
-    public String toString() {
-        return "HotelEntity{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", country='" + country + '\'' +
-                ", city='" + city + '\'' +
-                ", stars=" + stars +
-                '}';
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }
