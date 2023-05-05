@@ -11,7 +11,8 @@
             "capacity": 4, // max liczba osob w pokoju
             "name": "Pokój 2-osobowy", // nazwa widoczna na karcie
             "features": "klimatyzacja|TV|telefon", // lista zapisana w formacie string oddzielona |
-            "numberOfRooms": 20
+            "numberOfRooms": 20,
+            "basePrice": 240.50
         }
     ],
     "airport": "Paris [CDG]",
