@@ -1,0 +1,134 @@
+// Add Hotel Request (idzie to accommodation_service) //AddHotelQueue
+{
+    "name": "Samira Club Spa & Aquapark",
+    "country": "Tunezja",
+    "city": "Hammamet", // moze byc "" jesli nie bedzie miasta
+    "stars": 3, // integer 0 - 5, 0 jesli nie ma danych
+    "description": "...",
+    "photo": "url2", // to samo na miniaturke co na glowne
+    "rooms": [ // dostępne pokoje, wedlug typu
+        {
+            "capacity": 4, // max liczba osob w pokoju
+            "name": "Pokój 2-osobowy", // nazwa widoczna na karcie
+            "features": "klimatyzacja|TV|telefon", // lista zapisana w formacie string oddzielona |
+            "numberOfRooms": 20
+        }
+    ],
+    "airport": "Paris [CDG]",
+    "food": "none|breakfast|two-dishes|three-dishes|all-inclusive" // enum, minimum jedna z tych opcji, może nie być wcale
+}
+
+// Add flight (idzie do transport service) //CreateFlightQueue
+{
+    "departureAirport": "Warsaw (KOD)",
+    "arrivalAirport": "Paris (CDG)",
+    "departureDateTime": "26.06.2022 16:59",
+    "arrivalDate": "26.06.2022 18:00", // format dd.mm.yyyy hh:MM
+    "travelTime": 65, // podane w minutach,
+    "placesCount": 50
+}
+
+
+
+// Raczej nie potrzebujemy typowo wysyłać jednego pokoju albo wielu pokoi do frontu
+
+// Rezerwacja pokoju -> co front wysyła do api gateway
+{ // dodanie wycieczki do koszyka
+    "user": "USER10001",
+    "accommodation": {
+        "hotel": 1000,
+        "room": {
+            "capacity": 4, // max liczba osob w pokoju
+            "name": "Pokój 4-osobowy", // nazwa widoczna na karcie
+            "features": "klimatyzacja|TV|telefon" // lista zapisana w formacie string oddzielona |
+        }, 
+        "startDate": 21.06.2000,
+        "endDate": 28.06.2000,
+        "numberOfPeople": 2 // możesz wziąć wiekszy pokój dla mniejszej liczby osób
+    }
+    "transport": { // moze nie wystepowac jako pole zadania - wtedy transport wlasny
+        "departureAirport": "Warsaw (KOD)",
+        "arrivalAirport": "Paris (CDG)",
+        "departureDateTime": "26.06.2022 16:59",
+        "numberOfPlaces": 5 // liczba rezerwowanych miejsc
+    }
+}
+
+// Get Transport
+{
+    "departureAirport": "Warsaw (KOD)",
+    "arrivalAirport": "Paris (CDG)",
+    "departureDateTime": "26.06.2022 16:59",
+    "arrivalDate": "26.06.2022 18:00", // format dd.mm.yyyy hh:MM
+    "travelTime": 65, // podane w minutach,
+    "placesCount": 50, // liczba miejsc w samolocie
+    "placesOccupied": 15 // liczba zajetych miejsc
+}
+
+// GET TRIPS REQUEST
+//
+{ // kazde z nich jako path params nie jako body!!!!
+    "destCountry"
+    "destCity"    
+    "starDate"    
+    "endDate"    
+    "adults"
+    "people3To9"
+    "people10To17"
+}
+
+// Get Trips Response
+{
+    "trips": [
+        {
+            "id": 1,
+            "hotel": {
+                "id": 1,
+                "name": "Samira Club Spa & Aquapark",
+                "stars": 3,
+                "place": "Kraj / Miasto", // concat kraju i miasta
+                "photo": "photourl",
+
+            },
+            "tripPrice": 1800, // ca
+            "dateStart": "26.06.2022 16:59",
+            "dateEnd": "28.06.2022 16:59"
+        }
+    ]
+}
+
+// Get Trip Request
+{
+    "tripId": 1
+}
+
+// Get Trip Response
+{
+    "hotel": {
+        "id": 1000,
+        "name": "",
+        "country": "",
+        "city": "", // may be null/empty
+        "stars": 3, // integer 0 - 5, 0 jesli nie ma danych
+        "description": "...",
+        "photo": "url2", // to samo na miniaturke co na glowne
+        "rooms": [ // dostępne pokoje, wedlug typu
+            {
+                "capacity": 4, // max liczba osob w pokoju
+                "name": "Pokój 2-osobowy", // nazwa widoczna na karcie
+                "features": "klimatyzacja|TV|telefon" // lista zapisana w formacie string oddzielona |
+            }
+        ],
+        "airport": "Paris [CDG]",
+        "food": "none|breakfast|two-dishes|three-dishes|all-inclusive" // enum, minimum jedna z tych opcji, może nie być wcale
+    }
+    "transport": {
+        "departureAirport": "Warsaw (KOD)",
+        "arrivalAirport": "Paris (CDG)",
+        "departureDateTime": "26.06.2022 16:59",
+        "arrivalDate": "26.06.2022 18:00", // format dd.mm.yyyy hh:MM
+        "travelTime": 65, // podane w minutach,
+        "placesCount": 50, // liczba miejsc w samolocie
+        "placesOccupied": 15 // liczba zajetych miejsc
+    }
+}
