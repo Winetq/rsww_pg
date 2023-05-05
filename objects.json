@@ -15,7 +15,7 @@
             "basePrice": 240.50
         }
     ],
-    "airport": "Paris [CDG]",
+    "airport": "Paris (CDG)",
     "food": "none|breakfast|two-dishes|three-dishes|all-inclusive" // enum, minimum jedna z tych opcji, może nie być wcale
 }
 
