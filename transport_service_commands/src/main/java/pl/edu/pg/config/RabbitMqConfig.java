@@ -1,9 +1,5 @@
 package pl.edu.pg.config;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -17,8 +13,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMqConfig {
 
-    @Value("${spring.rabbitmq.queue.createFlightQueue}")
-    private String createFlightQueue;
+    @Value("${spring.rabbitmq.queue.addFlightQueue}")
+    private String addFlightQueue;
 
     @Value("${spring.rabbitmq.queue.eventDataStore}")
     private String eventDataStore;
@@ -36,8 +32,8 @@ public class RabbitMqConfig {
     private String port;
 
     @Bean
-    public Queue createFlightQueue() {
-        return new Queue(createFlightQueue, true);
+    public Queue addFlightQueue() {
+        return new Queue(addFlightQueue, true);
     }
 
     @Bean
@@ -63,10 +59,6 @@ public class RabbitMqConfig {
 
     @Bean
     public MessageConverter jsonMessageConverter() {
-        ObjectMapper om = new ObjectMapper();
-        om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        om.registerModule(new JavaTimeModule());
-        om.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        return new Jackson2JsonMessageConverter(om);
+        return new Jackson2JsonMessageConverter();
     }
 }

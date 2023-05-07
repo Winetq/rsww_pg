@@ -1,6 +1,6 @@
-package pl.edu.pg.transport.event;
+package pl.edu.pg.transport.query;
 
-public class GenericEvent {
+public class GenericQuery {
     private String source;
 
     public String getSource() {
