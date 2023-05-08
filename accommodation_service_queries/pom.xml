@@ -18,7 +18,9 @@
 	<properties>
 		<java.version>17</java.version>
 		<mongo.version>3.12.12</mongo.version>
-
+		<lombok.version>1.18.26</lombok.version>
+		<jackson.version>2.15.0</jackson.version>
+		<guava.version>31.1-jre</guava.version>
 	</properties>
 
 	<dependencies>
@@ -46,6 +48,23 @@
 			<artifactId>mongo-java-driver</artifactId>
 			<version>${mongo.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

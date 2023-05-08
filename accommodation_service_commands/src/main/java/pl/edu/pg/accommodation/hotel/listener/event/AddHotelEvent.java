@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @Jacksonized
 public class AddHotelEvent implements Event {
 
-    private String hotelName;
+    private String name;
     private String city;
     private String country;
     private int stars;
@@ -28,7 +28,7 @@ public class AddHotelEvent implements Event {
 
     public static Function<AddHotelEvent, HotelEntity> toEntityMapper() {
         return (event) -> HotelEntity.builder()
-                .name(event.getHotelName())
+                .name(event.getName())
                 .city(event.getCity())
                 .country(event.getCountry())
                 .stars(event.getStars())
@@ -47,14 +47,14 @@ public class AddHotelEvent implements Event {
         private String name;
         private String features;
         private int numberOfRooms;
-        private float price;
+        private float basePrice;
 
         public static Function<Room, RoomEntity> toEntityMapper(final Supplier<HotelEntity> hotelEntitySupplier) {
             return (room) -> RoomEntity.builder()
                     .capacity(room.getCapacity())
                     .name(room.getName())
                     .features(room.getFeatures())
-                    .price(room.getPrice())
+                    .price(room.getBasePrice())
                     .hotel(hotelEntitySupplier.get())
                     .build();
         }
