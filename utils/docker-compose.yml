@@ -46,3 +46,14 @@ services:
       MONGO_INITDB_DATABASE: transport_queries_db
     ports:
       - 27017:27017
+
+  payment:
+    build:
+      context: ../payment_service
+      dockerfile: Dockerfile
+    container_name: 'payment'
+    environment:
+      - AMQP_URL=rabbitmq
+      - REJECTION_PROBABILITY=10
+    depends_on:
+      - rabbitmq
