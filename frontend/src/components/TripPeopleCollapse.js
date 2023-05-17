@@ -6,7 +6,7 @@ import Form from 'react-bootstrap/Form';
 
 export default function TripPeopleCollapse({open,
                                             people3To9, setPeople3To9, 
-                                            people10To18, setPeople10To18, 
+                                            people10To17, setPeople10To17, 
                                             peopleOver18, setPeopleOver18}) 
 {
     return (
@@ -44,7 +44,7 @@ export default function TripPeopleCollapse({open,
                 <InputGroup>
                     <Button 
                         variant="outline-secondary" 
-                        onClick={() => setPeople10To18(Math.max(0, people10To18-1))}
+                        onClick={() => setPeople10To17(Math.max(0, people10To17-1))}
                     >
                         -
                     </Button>
@@ -52,15 +52,15 @@ export default function TripPeopleCollapse({open,
                         type="number" 
                         min="0" 
                         max="100" 
-                        value={people10To18} 
-                        onChange={(e) => setPeople10To18(e.target.value)} 
+                        value={people10To17} 
+                        onChange={(e) => setPeople10To17(e.target.value)} 
                         className="text-center"
                         readOnly
                         required
                     />
                     <Button 
                         variant="outline-secondary" 
-                        onClick={() => setPeople10To18(Math.max(0, people10To18+1))}
+                        onClick={() => setPeople10To17(Math.max(0, people10To17+1))}
                     >
                         +
                     </Button>

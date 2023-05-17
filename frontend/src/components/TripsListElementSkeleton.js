@@ -4,10 +4,10 @@ import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 
 
-export default function TripsListElementSkeleton() {
+export default function TripsListElementSkeleton({className=null}) {
 
     return (
-        <Card className="w-75 mx-auto p-3 shadow mb-3">
+        <Card className={"w-75 mx-auto p-3 shadow mb-3 " + className}>
             <div className="row g-0">
                 <div className="col-md-5">
                     <Skeleton className="h-100" style={{"minHeight": "200px"}}/>
@@ -19,19 +19,17 @@ export default function TripsListElementSkeleton() {
                                 <Skeleton />
                             </h5>
                         </Card.Title>
-                        <Card.Text>
-                            <ListGroup className="list-group-flush">
-                                <ListGroup.Item className="px-1">
-                                    <Skeleton />
-                                </ListGroup.Item>
-                                <ListGroup.Item className="px-1">
-                                    <Skeleton />
-                                </ListGroup.Item>
-                                <ListGroup.Item className="px-1">
-                                    <Skeleton />
-                                </ListGroup.Item>
-                            </ListGroup>
-                        </Card.Text>
+                        <ListGroup className="list-group-flush">
+                            <ListGroup.Item className="px-1">
+                                <Skeleton />
+                            </ListGroup.Item>
+                            <ListGroup.Item className="px-1">
+                                <Skeleton />
+                            </ListGroup.Item>
+                            <ListGroup.Item className="px-1">
+                                <Skeleton />
+                            </ListGroup.Item>
+                        </ListGroup>
                     </Card.Body>
                 </div>
             </div>

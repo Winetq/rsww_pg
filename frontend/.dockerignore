@@ -1,0 +1,3 @@
+
+# Exclude downloaded node packages
+*/node_modules

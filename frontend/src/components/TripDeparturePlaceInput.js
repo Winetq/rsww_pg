@@ -4,9 +4,25 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTruckPlane } from "@fortawesome/free-solid-svg-icons";
+import useFetch from "../hooks/useFetch";
+import UrlBuilder from "./UrlBuilder";
 
+
+const departurePlaces = {
+    departurePlaces: [
+        'Dojazd własny',
+        'Warszawa (WAW)',
+        'Gdańsk (GDA)',
+        'Kraków (KRA)'
+    ]
+}
 
 export default function TripDeparturePlaceInput({departurePlace, setDeparturePlace}) {
+    let urlBuilder = new UrlBuilder();
+    let {data, isPending, error} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_DEPARTURE_PLACES_URL'));
+    if(!isPending && data == null)
+        data = departurePlaces;
+
     return (
         <InputGroup>
             <InputGroup.Text>
@@ -20,12 +36,17 @@ export default function TripDeparturePlaceInput({departurePlace, setDeparturePla
                     type="select" 
                     onChange={(e) => setDeparturePlace(e.target.value)} 
                     value={departurePlace}
+                    className={isPending ? 'disabled' : ''}
                     required
                 >
-                    <option value="all">Any</option>
-                    <option value="clientself">By Yourself</option>
-                    <option value="city1">City 1</option>
-                    <option value="city2">City 2</option>
+                    {
+                    isPending ?
+                        <option value="all" key="all">Any</option>
+                    :
+                        data.departurePlaces.map((place) => (
+                            <option value={place} key={place}>{place}</option>
+                        ))
+                    }
                 </Form.Select>
             </FloatingLabel>
         </InputGroup>
