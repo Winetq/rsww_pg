@@ -1,0 +1,33 @@
+# This is example of docker-compose file which shows how to set
+# userservice container environment variables based on rest
+# of the system containers like database or AMQP system provider
+
+version: "3.9"
+
+services:
+
+  userservice:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=db
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_NAME=userservice
+      - AMQP_HOST=rabbitmq
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=userservice
+
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    ports:
+      - "15672:15672"
