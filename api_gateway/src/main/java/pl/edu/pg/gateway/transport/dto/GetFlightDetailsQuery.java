@@ -1,5 +1,8 @@
-package pl.edu.pg.transport.query;
+package pl.edu.pg.gateway.transport.dto;
 
+import lombok.Builder;
+
+@Builder
 public class GetFlightDetailsQuery {
     private long id;
 

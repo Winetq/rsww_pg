@@ -10,7 +10,6 @@
 **Get flight details**
 ```json
 {
-  "id": 1,
-  "source": "testSource"
+  "id": 1
 }
 ```

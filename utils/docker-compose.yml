@@ -15,15 +15,16 @@ services:
     container_name: 'transport-commands'
     restart: always
     depends_on:
-      - transport-commands-db
+      - rabbitmq
+      - postgres-db
 
-  transport-commands-db:
-    container_name: 'transport-commands-db'
+  postgres-db:
+    container_name: 'postgres-db'
     image: postgres
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: transport_commands_db
+      POSTGRES_DB: rsww
     ports:
       - 5432:5432
 
@@ -34,36 +35,46 @@ services:
     container_name: 'transport-queries'
     restart: always
     depends_on:
-      - transport-queries-db
+      - rabbitmq
+      - mongo-db
 
-  transport-queries-db:
-    container_name: 'transport-queries-db'
+  mongo-db:
+    container_name: 'mongo-db'
     image: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: transport_queries_db
+      MONGO_INITDB_DATABASE: rsww
     ports:
       - 27017:27017
 
+  api-gateway:
+    build:
+      context: ../api_gateway/
+      dockerfile: Dockerfile
+    container_name: 'api-gateway'
+    restart: always
+    ports:
+      - 8080:8080
+
   userservice:
-    container_name: userservice
-    build: 
+    container_name: 'userservice'
+    build:
       context: ../userservice/
       dockerfile: Dockerfile
     environment:
-      - DB_HOST=transport-commands-db
+      - DB_HOST=postgres-db
       - DB_USER=admin
       - DB_PASSWORD=admin
-      - DB_NAME=transport_commands_db
+      - DB_NAME=rsww
       - AMQP_HOST=rabbitmq
     depends_on:
       - rabbitmq
-      - transport-commands-db
+      - postgres-db
 
   frontend:
-    container_name: frontend
-    build: 
+    container_name: 'frontend'
+    build:
       context: ../frontend/
       dockerfile: Dockerfile
     ports:
