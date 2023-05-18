@@ -17,6 +17,16 @@ services:
     depends_on:
       - rabbitmq
       - postgres-db
+    environment:
+      - POSTGRES_USR=admin
+      - POSTGRES_PWD=admin
+      - POSTGRES_HOST=postgres-db
+      - POSTGRES_DATABASE=rsww
+      - POSTGRES_PORT=5432
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USR=guest
+      - RABBIT_PWD=guest
 
   postgres-db:
     container_name: 'postgres-db'
@@ -37,6 +47,16 @@ services:
     depends_on:
       - rabbitmq
       - mongo-db
+    environment:
+      - MONGO_USER=admin
+      - MONGO_PWD=admin
+      - MONGO_HOST=mongo-db
+      - MONGO_DATABASE=rsww
+      - MONGO_PORT=27017
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USR=guest
+      - RABBIT_PWD=guest
 
   mongo-db:
     container_name: 'mongo-db'
@@ -55,7 +75,12 @@ services:
     container_name: 'api-gateway'
     restart: always
     ports:
-      - 8080:8080
+      - 17515:8080
+    environment:
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USR=guest
+      - RABBIT_PWD=guest
 
   userservice:
     container_name: 'userservice'
@@ -90,3 +115,61 @@ services:
       - REJECTION_PROBABILITY=10
     depends_on:
       - rabbitmq
+
+  accommodation_service_commands:
+    container_name: accommodation_service_commands
+    build:
+      context: ../accommodation_service_commands
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - postgres-db
+    environment:
+      - POSTGRES_HOST=postgres-db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DATABASE=accommodation_service
+      - POSTGRES_USER=admin
+      - POSTGRES_PWD=admin
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USR=guest
+      - RABBIT_PWD=guest
+
+  accommodation_service_queries:
+    build:
+      context: ../accommodation_service_queries
+      dockerfile: Dockerfile
+    container_name: accommodation_service_queries
+    depends_on:
+      - rabbitmq
+      - mongo-db
+    environment:
+      - MONGO_USER=admin
+      - MONGO_USER_PWD=admin
+      - MONGO_HOST=mongo-db
+      - DATABASE_NAME=trips
+      - MONGO_PORT=27017
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USR=guest
+      - RABBIT_PWD=guest
+
+  trip_service:
+    container_name: trip_service
+    build:
+      context: ../trip_service
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - mongo-db
+    environment:
+      - MONGO_USER=admin
+      - MONGO_USER_PWD=admin
+      - MONGO_HOST=mongo-db
+      - DATABASE_NAME=trips
+      - MONGO_PORT=27017
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_USR=guest
+      - RABBIT_PWD=guest
+      

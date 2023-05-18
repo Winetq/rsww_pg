@@ -1,14 +1,11 @@
-package pl.edu.pg.trip.listener.events;
+package pl.edu.pg.gateway.trip.dto;
 
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Data
 @Builder

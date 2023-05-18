@@ -36,6 +36,7 @@ public class TripService {
 
     public List<Trip> getTrips() {
         if (FIRST_REQUEST) {
+            FIRST_REQUEST = true;
             return populateWithTrips();
         }
         return tripRepository.findAllTrips();

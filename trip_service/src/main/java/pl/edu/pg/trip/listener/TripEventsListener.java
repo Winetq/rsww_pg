@@ -38,7 +38,8 @@ public class TripEventsListener {
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.queue.trip.get.all}")
-    public TripsResponse getTrips(Message request) {
+    public TripsResponse getTrips(TripsRequest request, Message message) {
+        log.info("Request: {}", request);
         final Random random = new Random();
         final var trips = tripService.getTrips();
 
@@ -55,14 +56,15 @@ public class TripEventsListener {
                     return TripsResponse.Trip.builder()
                                     .tripPrice(random.nextFloat(1000, 5000))
                                     .id(trip.getTripId())
-                                    .dateStart(LocalDate.of(2023, 6, 21))
-                                    .dateEnd(LocalDate.of(2023, 6, 28))
+                                    .dateStart("26.06.2022 16:59")
+                                    .dateEnd("26.06.2022 16:59")
                                     .hotel(hotelDto)
                                     .build();
 
                         })
                         .collect(Collectors.toList()))
                 .build();
+        log.info("Response: {}", response);
         return response;
     }
 }

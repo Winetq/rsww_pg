@@ -7,8 +7,11 @@ RUN mvn clean package -Dmaven.test.skip=true
 
 FROM eclipse-temurin:17-alpine AS package
 
+RUN apk update && apk add bash
 COPY --from=compile target/*.jar /app/api_gateway.jar
 
 WORKDIR /app
+ADD docker-entry.sh /app/docker-entry.sh
+RUN chmod +x /app/docker-entry.sh
 
-CMD ["java", "-jar", "api_gateway.jar"]
+ENTRYPOINT ["/app/docker-entry.sh"]

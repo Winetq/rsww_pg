@@ -14,7 +14,7 @@ jobs:
     - uses: mr-smithers-excellent/docker-build-push@v5
       name: Build and push docker image for api_gateway
       with:
-        image: michal299/rsww_pg
+        image: mcwynar/rsww_pg
         tags: api_gateway
         registry: docker.io
         dockerfile: api_gateway/Dockerfile
@@ -25,7 +25,7 @@ jobs:
     - uses: mr-smithers-excellent/docker-build-push@v5
       name: Build and push docker image for transport_service_commands
       with:
-        image: michal299/rsww_pg
+        image: mcwynar/rsww_pg
         tags: transport_service_commands
         registry: docker.io
         dockerfile: transport_service_commands/Dockerfile
@@ -36,7 +36,7 @@ jobs:
     - uses: mr-smithers-excellent/docker-build-push@v5
       name: Build and push docker image for transport_service_queries
       with:
-        image: michal299/rsww_pg
+        image: mcwynar/rsww_pg
         tags: transport_service_queries
         registry: docker.io
         dockerfile: transport_service_queries/Dockerfile
@@ -47,7 +47,7 @@ jobs:
     - uses: mr-smithers-excellent/docker-build-push@v5
       name: Build and push docker image for userservice
       with:
-        image: michal299/rsww_pg
+        image: mcwynar/rsww_pg
         tags: userservice
         registry: docker.io
         dockerfile: userservice/Dockerfile
@@ -58,7 +58,7 @@ jobs:
     - uses: mr-smithers-excellent/docker-build-push@v5
       name: Build and push docker image for frontend
       with:
-        image: michal299/rsww_pg
+        image: mcwynar/rsww_pg
         tags: frontend
         registry: docker.io
         dockerfile: frontend/Dockerfile
@@ -69,10 +69,43 @@ jobs:
     - uses: mr-smithers-excellent/docker-build-push@v5
       name: Build and push docker image for payment_service
       with:
-        image: michal299/rsww_pg
+        image: mcwynar/rsww_pg
         tags: payment_service
         registry: docker.io
         dockerfile: payment_service/Dockerfile
         directory: payment_service/
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: mr-smithers-excellent/docker-build-push@v5
+      name: Build and push docker image for accommodation_service_commands
+      with:
+        image: mcwynar/rsww_pg
+        tags: accommodation_service_commands
+        registry: docker.io
+        dockerfile: accommodation_service_commands/Dockerfile
+        directory: accommodation_service_commands/
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: mr-smithers-excellent/docker-build-push@v5
+      name: Build and push docker image for accommodation_service_queries
+      with:
+        image: mcwynar/rsww_pg
+        tags: accommodation_service_queries
+        registry: docker.io
+        dockerfile: accommodation_service_queries/Dockerfile
+        directory: accommodation_service_queries/
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: mr-smithers-excellent/docker-build-push@v5
+      name: Build and push docker image for trip_service
+      with:
+        image: mcwynar/rsww_pg
+        tags: trip_service
+        registry: docker.io
+        dockerfile: trip_service/Dockerfile
+        directory: trip_service/
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
