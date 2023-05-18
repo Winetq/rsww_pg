@@ -31,4 +31,5 @@ COPY . .
 
 EXPOSE 8000
 RUN chmod 755 ./runserver.sh
+RUN chmod 755 ./dbinit.sh
 ENTRYPOINT ["./runserver.sh"]

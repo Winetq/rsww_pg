@@ -12,4 +12,4 @@ python manage.py createadmin
 
 # Create 20 custom users
 echo "Create 20 custom users"
-python manage.py generateusers -c 20
+python manage.py generateusers -c 10

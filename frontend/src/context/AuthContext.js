@@ -13,7 +13,8 @@ export const AuthProvider = ({children}) => {
     const navigate = useNavigate();
     const urlBuilder = new UrlBuilder();
 
-    const authTokenUrl = urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_LOGIN_URL');
+    // const authTokenUrl = urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_LOGIN_URL');
+    const authTokenUrl = 'http://127.0.0.1:8080/api/token'
     const refreshAuthTokenUrl = urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TOKEN_REFRESH_URL');
 
     let localStorageAuthTokens = localStorage.getItem('authTokens');
