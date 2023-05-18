@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Init database
-# ./dbinit.sh
+./dbinit.sh
 
 # Launch server
 echo "Launch server"
