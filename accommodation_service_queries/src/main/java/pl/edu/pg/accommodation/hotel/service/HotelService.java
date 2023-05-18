@@ -23,7 +23,7 @@ public class HotelService {
     }
 
     public Optional<Hotel> getHotel(final Long id) {
-        return Optional.empty();
+        return hotelRepository.findHotel(id);
     }
 
     public Hotel addHotel(final Hotel hotel) {

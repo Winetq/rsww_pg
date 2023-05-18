@@ -1,5 +1,6 @@
 package pl.edu.pg.accommodation.config;
 
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -38,5 +39,10 @@ public class RabbitMQConfig {
     public AsyncRabbitTemplate asyncRabbitTemplate(
             RabbitTemplate rabbitTemplate){
         return new AsyncRabbitTemplate(rabbitTemplate);
+    }
+
+    @Bean
+    FanoutExchange updateHotelFanout(@Value("${spring.rabbitmq.fanout.hotel.add}") String fanoutName) {
+        return new FanoutExchange(fanoutName);
     }
 }

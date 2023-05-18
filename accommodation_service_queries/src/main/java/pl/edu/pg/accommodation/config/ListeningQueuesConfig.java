@@ -1,5 +1,6 @@
 package pl.edu.pg.accommodation.config;
 
+import org.springframework.amqp.core.AnonymousQueue;
 import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -36,5 +37,10 @@ public class ListeningQueuesConfig {
     @Bean
     public Queue updateDeleteRoomQueue(@Value("${spring.rabbitmq.queue.update.hotel.room.remove}") String queueName) {
         return new Queue(queueName, true);
+    }
+
+    @Bean(name = "autoDeleteQueue")
+    Queue autoDeleteQueue() {
+        return new AnonymousQueue();
     }
 }

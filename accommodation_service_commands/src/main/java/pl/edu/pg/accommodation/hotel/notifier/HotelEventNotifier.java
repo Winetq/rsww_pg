@@ -1,5 +1,6 @@
 package pl.edu.pg.accommodation.hotel.notifier;
 
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,16 +13,18 @@ public class HotelEventNotifier {
 
     private final RabbitTemplate rabbitTemplate;
     private final String addHotelNotificationQueue;
-
+    private final FanoutExchange fanoutExchange;
     @Autowired
     public HotelEventNotifier(final RabbitTemplate rabbitTemplate,
-                              @Value("${spring.rabbitmq.queue.update.hotel.add}") final String addHotelQueue) {
+                              @Value("${spring.rabbitmq.queue.update.hotel.add}") final String addHotelQueue,
+                              final FanoutExchange fanoutExchange) {
         this.rabbitTemplate = rabbitTemplate;
         this.addHotelNotificationQueue = addHotelQueue;
+        this.fanoutExchange = fanoutExchange;
     }
 
     public void notifyNewHotel(final HotelEntity hotel) {
         final var dto = NotifyHotelAdded.entityToDtoMapper().apply(hotel);
-        rabbitTemplate.convertAndSend(addHotelNotificationQueue, dto);
+        rabbitTemplate.convertAndSend(fanoutExchange.getName(), addHotelNotificationQueue, dto);
     }
 }

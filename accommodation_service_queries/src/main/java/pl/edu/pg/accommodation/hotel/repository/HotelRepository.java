@@ -55,12 +55,18 @@ public class HotelRepository {
             );
         }, () -> {
             log.error("No hotel with id: {}. Cannot add room to not existing hotel.", hotelId);
-            throw new NoSuchElementException("No hotel found.");
+//            throw new NoSuchElementException("No hotel found.");
         });
         return room;
     }
 
     private MongoCollection<Hotel> hotelsCollection() {
         return mongoDb.getDatabase().getCollection(HOTEL_COLLECTION, Hotel.class);
+    }
+
+    public Optional<Hotel> findHotel(final Long id) {
+        BasicDBObject query = new BasicDBObject();
+        query.put("_id", id);
+        return Optional.ofNullable(hotelsCollection().find(query).first());
     }
 }

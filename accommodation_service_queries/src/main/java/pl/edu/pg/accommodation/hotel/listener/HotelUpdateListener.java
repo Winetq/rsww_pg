@@ -1,5 +1,7 @@
 package pl.edu.pg.accommodation.hotel.listener;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
@@ -11,6 +13,7 @@ import pl.edu.pg.accommodation.hotel.service.HotelService;
 @Component
 public class HotelUpdateListener {
 
+    private final static Logger log = LoggerFactory.getLogger(HotelUpdateListener.class);
     private final HotelService hotelService;
 
     @Autowired
@@ -18,8 +21,9 @@ public class HotelUpdateListener {
         this.hotelService = hotelService;
     }
 
-    @RabbitListener(queues = "${spring.rabbitmq.queue.update.hotel.add}")
+    @RabbitListener(queues = "#{autoDeleteQueue}")
     public void addHotelUpdate(Message<AddHotelEvent> addHotelEvent) {
+        log.info("{}", addHotelEvent.getPayload());
         final var hotel = AddHotelEvent.dtoToEntityMapper().apply(addHotelEvent.getPayload());
         hotelService.addHotel(hotel);
     }

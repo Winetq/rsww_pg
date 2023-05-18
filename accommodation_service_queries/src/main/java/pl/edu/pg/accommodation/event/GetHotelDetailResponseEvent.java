@@ -22,6 +22,7 @@ public class GetHotelDetailResponseEvent implements Event {
     private Set<Room> rooms;
     private String airport;
     private String food;
+    private String name;
 
     @Data
     @Builder
@@ -47,6 +48,7 @@ public class GetHotelDetailResponseEvent implements Event {
                         .build()).collect(Collectors.toSet()))
                 .airport(entity.getAirport())
                 .food(entity.getFood())
+                .name(entity.getName())
                 .build();
     }
 }

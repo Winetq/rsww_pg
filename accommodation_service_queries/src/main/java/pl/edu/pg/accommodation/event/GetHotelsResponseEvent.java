@@ -27,6 +27,7 @@ public class GetHotelsResponseEvent implements Event {
         private int stars;
         private String place;
         private String photo;
+        private String airport;
     }
 
     public static Function<Collection<pl.edu.pg.accommodation.model.Hotel>, GetHotelsResponseEvent> entityToDtoMapper() {
@@ -38,6 +39,7 @@ public class GetHotelsResponseEvent implements Event {
                                 .stars(hotel.getStars())
                                 .place(getPlaceSafely(hotel.getCountry(), hotel.getCity()))
                                 .photo(hotel.getPhoto())
+                                .airport(hotel.getAirport())
                                 .build())
                         .collect(Collectors.toList()))
                 .build();

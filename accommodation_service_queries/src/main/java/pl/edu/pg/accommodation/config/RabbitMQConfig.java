@@ -1,10 +1,14 @@
 package pl.edu.pg.accommodation.config;
 
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -63,5 +67,16 @@ public class RabbitMQConfig {
         cachingConnectionFactory.setUsername(username);
         cachingConnectionFactory.setPassword(password);
         return cachingConnectionFactory;
+    }
+
+    @Bean
+    FanoutExchange updateHotelFanout(@Value("${spring.rabbitmq.fanout.hotel.add}") String fanoutName) {
+        return new FanoutExchange(fanoutName);
+    }
+
+    @Bean
+    @Qualifier("autoDeleteQueue")
+    public Binding addHotelFanout(FanoutExchange fanout, Queue autoDeleteQueue) {
+        return BindingBuilder.bind(autoDeleteQueue).to(fanout);
     }
 }
