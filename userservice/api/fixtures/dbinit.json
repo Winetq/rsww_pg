@@ -1,0 +1,157 @@
+[
+    {
+        "model": "api.CustomUser",
+        "pk": 1,
+        "fields": {
+            "firstname": "Admin",
+            "lastname": "Admin",
+            "username": "admin",
+            "password": "pbkdf2_sha256$600000$JUDIVWrfWRAprBsfe0rgty$6rxBesyHelmzC3kzqhA4qAgyd2uvd3hRZ9km+TJuu7A=",
+            "role": 1,
+            "is_staff": false,
+            "is_superuser": true,
+            "is_active": true
+        }
+    },
+
+    {
+        "model": "api.CustomUser",
+        "pk": 2,
+        "fields": {
+            "firstname": "Malina",
+            "lastname": "Bartoszek",
+            "username": "user0",
+            "password": "pbkdf2_sha256$600000$uoK4Q8783ydeQi5slu19L5$MNENtaq5Ugvb9cO1cxzn46f+BW2XWV6UkfCFVj7v3hY=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 3,
+        "fields": {
+            "firstname": "Iwan",
+            "lastname": "Bembenek",
+            "username": "user1",
+            "password": "pbkdf2_sha256$600000$6C1c1rInkRqwI1w0Vrl0Yr$isJbwE0HzXofY4hwkHSajFpkcktFQy7clVO4JRbOH8s=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 4,
+        "fields": {
+            "firstname": "Marcel",
+            "lastname": "Zagata",
+            "username": "user2",
+            "password": "pbkdf2_sha256$600000$Tj9akEZ94MQDffU4c3IqA0$2eXlVvCANlXt+j2l0IVo96ItFauUtEQi5bxpCB1tbq4=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 5,
+        "fields": {
+            "firstname": "Wit",
+            "lastname": "Kalata",
+            "username": "user3",
+            "password": "pbkdf2_sha256$600000$KF8XVI5PBXPK4GMYjFodGy$WoBs9R+bNTTy8+0XLIU9pEyHnQWxVzaxVrT8omEpURI=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 6,
+        "fields": {
+            "firstname": "Leszek",
+            "lastname": "Bisek",
+            "username": "user4",
+            "password": "pbkdf2_sha256$600000$it8OQum8nsKp4rJNSvLH5C$Rbb1CzuXMNsOuHnmmdm0tuuNVM5wRG7obBf1eWALnpc=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 7,
+        "fields": {
+            "firstname": "Herbert",
+            "lastname": "Janos",
+            "username": "user5",
+            "password": "pbkdf2_sha256$600000$nWvRAOZRNKhECwbM3Dg1oY$6HNTc/QRqw4JJKmby7kE3DelsQ9crrLRBhnalRTNgjE=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 8,
+        "fields": {
+            "firstname": "Jan",
+            "lastname": "Kalata",
+            "username": "user6",
+            "password": "pbkdf2_sha256$600000$cStsCFva0J9gSTynah700u$tNNi0kcz0kMoP9Q0dT2I4wdkEgy8pY2kd/CaE9Vq3uY=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 9,
+        "fields": {
+            "firstname": "Luiza",
+            "lastname": "Bonar",
+            "username": "user7",
+            "password": "pbkdf2_sha256$600000$STamUobA57I7K8fcyEvljG$DnZim/vy3xXz+Ig623Z0BauK23LbMNSrYAr8OChyvrk=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 10,
+        "fields": {
+            "firstname": "Dionizy",
+            "lastname": "Prokop",
+            "username": "user8",
+            "password": "pbkdf2_sha256$600000$9C7aXhr0LGsJimYEnLi2Bw$CTLFQAxK74aGBj1/h9GG8IAN3xWblThn2GjaxXryaD0=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    },
+    {
+        "model": "api.CustomUser",
+        "pk": 11,
+        "fields": {
+            "firstname": "Malina",
+            "lastname": "Kurzawa",
+            "username": "user9",
+            "password": "pbkdf2_sha256$600000$WUwpYDN3faq3ZZ9IQOfN9P$zEbBFyB9X617Wf8HNyWnhuG5gUrRMvGSCjpw2xHkw4M=",
+            "role": 2,
+            "is_staff": false,
+            "is_superuser": false,
+            "is_active": true
+        }
+    }
+]
