@@ -13,7 +13,7 @@ import pl.edu.pg.gateway.trip.dto.TripsResponse;
 import java.util.Optional;
 
 @Service
-public class TripService {
+class TripService {
     private final Logger log = LoggerFactory.getLogger(TripService.class);
     private final RabbitTemplate rabbitTemplate;
     private final String getTripsQueueName;
@@ -25,7 +25,7 @@ public class TripService {
         this.getTripsQueueName = getTripsQueueName;
     }
 
-    public Optional<TripsResponse> getTrips() {
+    Optional<TripsResponse> getTrips() {
         final TripsRequest request = TripsRequest.builder().build();
         final TripsResponse response = rabbitTemplate.convertSendAndReceiveAsType(
                 getTripsQueueName,

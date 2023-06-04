@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pg.gateway.trip.dto.TripsResponse;
 
 @RestController
-@RequestMapping("/api/trip/")
-public class TripController {
+@RequestMapping("/api/trips")
+class TripController {
 
     private final TripService tripService;
 
     @Autowired
-    public TripController(final TripService tripService) {
+    TripController(final TripService tripService) {
         this.tripService = tripService;
     }
 
