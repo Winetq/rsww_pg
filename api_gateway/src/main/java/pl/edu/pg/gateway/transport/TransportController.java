@@ -8,7 +8,7 @@ import pl.edu.pg.gateway.transport.dto.GetFlightDetailsResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/transports")
+@RequestMapping("api")
 class TransportController {
     private final TransportService transportService;
 
@@ -17,12 +17,20 @@ class TransportController {
         this.transportService = transportService;
     }
 
-    @GetMapping("{id}")
+    @GetMapping("transports/{id}")
     ResponseEntity<GetFlightDetailsResponse> getFlightDetails(@PathVariable Long id) {
         return transportService.getFlightDetails(id);
     }
 
-    @GetMapping
+    @GetMapping("transport")
+    ResponseEntity<GetFlightDetailsResponse> getFlightWithParameters(@RequestParam String departureAirport,
+                                                                     @RequestParam String arrivalAirport,
+                                                                     @RequestParam String departureDate,
+                                                                     @RequestParam String arrivalDate) {
+        return transportService.getFlightWithParameters(departureAirport, arrivalAirport, departureDate, arrivalDate);
+    }
+
+    @GetMapping("transports")
     ResponseEntity<List<GetFlightDetailsResponse>> getFlights() {
         return transportService.getFlights();
     }

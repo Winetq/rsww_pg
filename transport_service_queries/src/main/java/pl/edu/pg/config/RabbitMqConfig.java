@@ -16,6 +16,9 @@ public class RabbitMqConfig {
     @Value("${spring.rabbitmq.queue.getFlightsQueue}")
     private String getFlightsQueue;
 
+    @Value("${spring.rabbitmq.queue.getFlightWithParametersQueue}")
+    private String getFlightWithParametersQueue;
+
     @Value("${spring.rabbitmq.queue.getFlightDetailsQueue}")
     private String getFlightDetailsQueue;
 
@@ -34,6 +37,11 @@ public class RabbitMqConfig {
     @Bean
     public Queue getFlightsQueue() {
         return new Queue(getFlightsQueue, true);
+    }
+
+    @Bean
+    public Queue getFlightWithParametersQueue() {
+        return new Queue(getFlightWithParametersQueue, true);
     }
 
     @Bean

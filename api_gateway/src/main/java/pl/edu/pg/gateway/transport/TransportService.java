@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.edu.pg.gateway.transport.dto.GetFlightDetailsQuery;
 import pl.edu.pg.gateway.transport.dto.GetFlightDetailsResponse;
+import pl.edu.pg.gateway.transport.dto.GetFlightWithParametersQuery;
 import pl.edu.pg.gateway.transport.dto.GetFlightsQuery;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 class TransportService {
     private final RabbitTemplate rabbitTemplate;
     private static final String GET_FLIGHT_DETAILS_QUEUE = "GetFlightDetailsQueue";
+    private static final String GET_FLIGHT_WITH_PARAMETERS_QUEUE = "GetFlightWithParametersQueue";
     private static final String GET_FLIGHTS_QUEUE = "GetFlightsQueue";
 
     @Autowired
@@ -38,6 +40,24 @@ class TransportService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    ResponseEntity<GetFlightDetailsResponse> getFlightWithParameters(String departureAirport, String arrivalAirport, String departureDate, String arrivalDate) {
+        GetFlightWithParametersQuery query = GetFlightWithParametersQuery.builder()
+                .departureAirport(departureAirport)
+                .arrivalAirport(arrivalAirport)
+                .departureDate(departureDate)
+                .arrivalDate(arrivalDate)
+                .build();
+        GetFlightDetailsResponse response = rabbitTemplate.convertSendAndReceiveAsType(
+                GET_FLIGHT_WITH_PARAMETERS_QUEUE,
+                query,
+                new ParameterizedTypeReference<>() {
+                });
+        if (response != null && response.getId() == -1) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     ResponseEntity<List<GetFlightDetailsResponse>> getFlights() {
         List<GetFlightDetailsResponse> response = rabbitTemplate.convertSendAndReceiveAsType(
                 GET_FLIGHTS_QUEUE,
@@ -46,5 +66,4 @@ class TransportService {
                 });
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 }
