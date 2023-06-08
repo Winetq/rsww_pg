@@ -7,10 +7,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.edu.pg.gateway.hotel.dto.GetHotelDetailResponseEvent;
-import pl.edu.pg.gateway.hotel.dto.GetHotelDetailsEvent;
-import pl.edu.pg.gateway.hotel.dto.GetHotelsEvent;
-import pl.edu.pg.gateway.hotel.dto.GetHotelsResponseEvent;
+import pl.edu.pg.gateway.hotel.dto.*;
 
 @Service
 class HotelService {
@@ -37,6 +34,17 @@ class HotelService {
         if (response != null && response.getId() == -1) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    ResponseEntity<GetHotelsResponseEvent> getHotels(String country, String city) {
+        GetHotelsWithParametersEvent query = GetHotelsWithParametersEvent.builder().country(country).city(city).build();
+        System.out.println(query);
+        GetHotelsResponseEvent response = rabbitTemplate.convertSendAndReceiveAsType(
+                getHotelsQueueName,
+                query,
+                new ParameterizedTypeReference<>() {
+                });
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

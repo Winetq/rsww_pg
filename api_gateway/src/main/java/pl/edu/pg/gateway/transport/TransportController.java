@@ -28,9 +28,9 @@ class TransportController {
 
     @GetMapping
     ResponseEntity<List<GetFlightDetailsResponse>> getFlights(@RequestParam(required = false) String departureAirport,
-                                                                     @RequestParam(required = false) String arrivalAirport,
-                                                                     @RequestParam(required = false) String departureDate,
-                                                                     @RequestParam(required = false) String arrivalDate) {
+                                                              @RequestParam(required = false) String arrivalAirport,
+                                                              @RequestParam(required = false) String departureDate,
+                                                              @RequestParam(required = false) String arrivalDate) {
         if (departureAirport == null || arrivalAirport == null || departureDate == null || arrivalDate == null) {
             return transportService.getFlights();
         }
