@@ -60,4 +60,14 @@ class TripService {
     ResponseEntity<String> getDestinations() {
         return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
     }
+
+    ResponseEntity<String> reserveTrip(Long id) {
+        System.out.println("Reserve a trip with id: " + id);
+        return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    ResponseEntity<String> payForTrip(Long id) {
+        System.out.println("Pay for a trip with id: " + id);
+        return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
+    }
 }

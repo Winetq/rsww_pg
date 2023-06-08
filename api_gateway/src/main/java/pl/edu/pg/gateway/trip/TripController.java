@@ -3,7 +3,12 @@ package pl.edu.pg.gateway.trip;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import pl.edu.pg.gateway.trip.dto.TripDetailsResponse;
 import pl.edu.pg.gateway.trip.dto.TripsResponse;
 
@@ -39,6 +44,16 @@ class TripController {
             return tripService.getDestinations();
         }
         return tripService.getDestinations(startDate, endDate);
+    }
+
+    @PostMapping("{id}/reserve")
+    ResponseEntity<String> reserveTrip(@PathVariable Long id) {
+        return tripService.reserveTrip(id);
+    }
+
+    @PostMapping("{id}/payment")
+    ResponseEntity<String> payForTrip(@PathVariable Long id) {
+        return tripService.payForTrip(id);
     }
     
 }
