@@ -4,6 +4,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.edu.pg.gateway.trip.dto.TripDetailsRequest;
 import pl.edu.pg.gateway.trip.dto.TripDetailsResponse;
@@ -47,5 +49,15 @@ class TripService {
                 }
         );
         return Optional.ofNullable(response);
+    }
+
+    ResponseEntity<String> getDestinations(String startDate, String endDate) {
+        System.out.println(startDate);
+        System.out.println(endDate);
+        return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    ResponseEntity<String> getDestinations() {
+        return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
     }
 }
