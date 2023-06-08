@@ -40,21 +40,18 @@ class TransportService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    ResponseEntity<GetFlightDetailsResponse> getFlightWithParameters(String departureAirport, String arrivalAirport, String departureDate, String arrivalDate) {
+    ResponseEntity<List<GetFlightDetailsResponse>> getFlights(String departureAirport, String arrivalAirport, String departureDate, String arrivalDate) {
         GetFlightWithParametersQuery query = GetFlightWithParametersQuery.builder()
                 .departureAirport(departureAirport)
                 .arrivalAirport(arrivalAirport)
                 .departureDate(departureDate)
                 .arrivalDate(arrivalDate)
                 .build();
-        GetFlightDetailsResponse response = rabbitTemplate.convertSendAndReceiveAsType(
+        List<GetFlightDetailsResponse> response = rabbitTemplate.convertSendAndReceiveAsType(
                 GET_FLIGHT_WITH_PARAMETERS_QUEUE,
                 query,
                 new ParameterizedTypeReference<>() {
                 });
-        if (response != null && response.getId() == -1) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
