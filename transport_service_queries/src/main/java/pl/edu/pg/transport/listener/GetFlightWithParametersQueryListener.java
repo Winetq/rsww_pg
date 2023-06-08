@@ -6,12 +6,13 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.edu.pg.transport.dto.GetFlightDetailsResponse;
+import pl.edu.pg.transport.dto.GetFlightsResponse;
 import pl.edu.pg.transport.entity.Flight;
 import pl.edu.pg.transport.query.GetFlightWithParametersQuery;
 import pl.edu.pg.transport.repository.FlightRepository;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class GetFlightWithParametersQueryListener {
@@ -25,22 +26,16 @@ public class GetFlightWithParametersQueryListener {
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.queue.getFlightWithParametersQueue}")
-    public GetFlightDetailsResponse receiveMessage(GetFlightWithParametersQuery message) {
+    public List<GetFlightDetailsResponse> receiveMessage(GetFlightWithParametersQuery message) {
         List<Flight> flights = repository.findAll();
-        Optional<Flight> flightWithParameters = flights
+        List<Flight> flightWithParameters = flights
                 .stream()
                 .filter(flight -> flight.getDepartureAirport().equals(message.getDepartureAirport()))
                 .filter(flight -> flight.getArrivalAirport().equals(message.getArrivalAirport()))
-                .filter(flight -> flight.getDepartureDate().equals(message.getDepartureDate()))
-                .filter(flight -> flight.getArrivalDate().equals(message.getArrivalDate()))
-                .findAny();
-        if (flightWithParameters.isEmpty()) {
-            logger.info("Flight with these parameters does not exist.");
-            return GetFlightDetailsResponse.builder()
-                    .id(-1)
-                    .build();
-        }
-        logger.info("Flight with these parameters was found.");
-        return GetFlightDetailsResponse.entityToDtoMapper().apply(flightWithParameters.get());
+                .filter(flight -> flight.getDepartureDate().startsWith(message.getDepartureDate()))
+                .filter(flight -> flight.getArrivalDate().startsWith(message.getArrivalDate()))
+                .collect(Collectors.toList());
+        logger.info("Flights with these parameters were sent.");
+        return GetFlightsResponse.entityToDtoMapper().apply(flightWithParameters);
     }
 }
