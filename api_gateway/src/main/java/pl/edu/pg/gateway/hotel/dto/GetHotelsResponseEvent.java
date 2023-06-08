@@ -1,4 +1,4 @@
-package pl.edu.pg.gateway.trip.dto;
+package pl.edu.pg.gateway.hotel.dto;
 
 import lombok.Builder;
 import lombok.Data;
@@ -9,19 +9,8 @@ import java.util.List;
 @Data
 @Builder
 @Jacksonized
-public class TripsResponse {
-    private List<Trip> trips;
-
-    @Data
-    @Builder
-    @Jacksonized
-    public static class Trip {
-        private Long id;
-        private Hotel hotel;
-        private Float tripPrice;
-        private String dateStart;
-        private String dateEnd;
-    }
+public class GetHotelsResponseEvent {
+    private List<Hotel> hotels;
 
     @Data
     @Builder
@@ -32,5 +21,6 @@ public class TripsResponse {
         private int stars;
         private String place;
         private String photo;
+        private String airport;
     }
 }
