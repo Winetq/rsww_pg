@@ -39,7 +39,6 @@ class HotelService {
 
     ResponseEntity<GetHotelsResponseEvent> getHotels(String country, String city) {
         GetHotelsWithParametersEvent query = GetHotelsWithParametersEvent.builder().country(country).city(city).build();
-        System.out.println(query);
         GetHotelsResponseEvent response = rabbitTemplate.convertSendAndReceiveAsType(
                 getHotelsQueueName,
                 query,
