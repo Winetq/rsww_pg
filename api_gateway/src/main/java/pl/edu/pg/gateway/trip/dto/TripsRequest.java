@@ -8,4 +8,10 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class TripsRequest {
+    private String destination;
+    private String departure;
+    private String startDate;
+    private Integer adults;
+    private Integer people3To9;
+    private Integer people10To17;
 }

@@ -39,7 +39,7 @@ class MyTripService {
     }
 
     Optional<TripDetailsResponse> getMyTripDetails(Long id) {
-        final TripDetailsRequest request = TripDetailsRequest.builder().id(id).build();
+        final TripDetailsRequest request = TripDetailsRequest.builder().tripId(id).build();
         final TripDetailsResponse response = rabbitTemplate.convertSendAndReceiveAsType(
                 getTripDetailsQueueName,
                 request,

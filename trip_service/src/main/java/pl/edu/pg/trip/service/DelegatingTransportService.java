@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import pl.edu.pg.trip.enity.Transport;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class DelegatingTransportService {
@@ -23,5 +24,9 @@ public class DelegatingTransportService {
 
     public List<Transport> getTransports() {
         return ImmutableList.of();
+    }
+
+    public Optional<Transport> getTransport(Long id) {
+        return Optional.empty();
     }
 }

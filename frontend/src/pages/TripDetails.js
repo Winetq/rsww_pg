@@ -83,7 +83,7 @@ const TripDetails = () => {
     let [isReserving, setIsReserving] = useState(false);
 
     const urlBuilder = new UrlBuilder();
-    let {data, isPending, error} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL') + '?id=' + id);
+    let {data, isPending, error} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL', id));
     if(!isPending && data == null)
         data = trip;
 

@@ -1,21 +1,28 @@
 package pl.edu.pg.gateway.trip;
 
+import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.edu.pg.gateway.trip.dto.TripDetailsRequest;
 import pl.edu.pg.gateway.trip.dto.TripDetailsResponse;
 import pl.edu.pg.gateway.trip.dto.TripsRequest;
 import pl.edu.pg.gateway.trip.dto.TripsResponse;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
-class TripService {
+public class TripService {
+    private final Logger log = LoggerFactory.getLogger(TripService.class);
     private final RabbitTemplate rabbitTemplate;
     private final String getTripsQueueName;
     private final String getTripDetailsQueueName;
@@ -29,8 +36,8 @@ class TripService {
         this.getTripDetailsQueueName = getTripDetailsQueueName;
     }
 
-    Optional<TripsResponse> getTrips() {
-        final TripsRequest request = TripsRequest.builder().build();
+    public Optional<TripsResponse> getTrips(final SearchParams searchParams) {
+        final TripsRequest request = SearchParams.requestMapper().apply(searchParams);
         final TripsResponse response = rabbitTemplate.convertSendAndReceiveAsType(
                 getTripsQueueName,
                 request,
@@ -40,8 +47,8 @@ class TripService {
         return Optional.ofNullable(response);
     }
 
-    Optional<TripDetailsResponse> getTripDetails(Long id) {
-        final TripDetailsRequest request = TripDetailsRequest.builder().id(id).build();
+    public Optional<TripDetailsResponse> getTrip(final Long id) {
+        final var request = TripDetailsRequest.builder().tripId(id).build();
         final TripDetailsResponse response = rabbitTemplate.convertSendAndReceiveAsType(
                 getTripDetailsQueueName,
                 request,
@@ -51,23 +58,34 @@ class TripService {
         return Optional.ofNullable(response);
     }
 
-    ResponseEntity<String> getDestinations(String startDate, String endDate) {
-        System.out.println(startDate);
-        System.out.println(endDate);
-        return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
+    public List<String> getDestinations() {
+        return ImmutableList.of("Egipt", "Turcja", "Włochy", "Hiszpania");
     }
 
-    ResponseEntity<String> getDestinations() {
-        return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
+    public List<String> getPossibleDepartures() {
+        return ImmutableList.of("Dojazd własny", "Warszawa (WAW)", "Gdańsk (GDA)", "Kraków (KRA)");
     }
 
-    ResponseEntity<String> reserveTrip(Long id) {
-        System.out.println("Reserve a trip with id: " + id);
-        return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
-    }
+    @Data
+    @Builder
+    @Jacksonized
+    public static class SearchParams {
+        private String destination;
+        private String departure;
+        private String startDate;
+        private Integer adults;
+        private Integer people3To9;
+        private Integer people10To17;
 
-    ResponseEntity<String> payForTrip(Long id) {
-        System.out.println("Pay for a trip with id: " + id);
-        return new ResponseEntity<>("Not implemented yet!", HttpStatus.NOT_IMPLEMENTED);
+        public static Function<SearchParams, TripsRequest> requestMapper() {
+            return params -> TripsRequest.builder()
+                    .adults(params.adults)
+                    .departure(params.departure)
+                    .destination(params.destination)
+                    .people10To17(params.people10To17)
+                    .people3To9(params.people3To9)
+                    .startDate(params.startDate)
+                    .build();
+        }
     }
 }

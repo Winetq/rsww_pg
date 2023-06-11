@@ -8,5 +8,5 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 public class TripDetailsRequest {
-    private long id;
+    private long tripId;
 }

@@ -15,6 +15,7 @@ public class Transport {
     private String departureAirport;
     private String arrivalAirport;
     private LocalDateTime arrivalDate;
+    private LocalDateTime departureDate;
     private Long travelTime;
     private Long placesCount;
     private Long placesOccupied;

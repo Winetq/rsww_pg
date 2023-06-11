@@ -30,10 +30,6 @@ public class TripService {
         this.transportService = transportService;
     }
 
-    public void addTripsForAccommodation(String accommodationAirport, Long accommodationId) {
-
-    }
-
     public List<Trip> getTrips() {
         if (FIRST_REQUEST) {
             FIRST_REQUEST = true;
