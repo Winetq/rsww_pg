@@ -7,36 +7,61 @@ import {
     faLocationDot, faCalendar, faHotel, faCoins, faStar, 
     faCircleNotch, faCreditCard, faXmark
 } from "@fortawesome/free-solid-svg-icons";
+import UrlBuilder from "./UrlBuilder";
+import InfoToast from "../components/InfoToast";
 
 
 const MyReservationsListElement = ({reservation}) => {
 
+    const urlBuilder = new UrlBuilder();
+    
     let [isPaying, setIsPaying] = useState(false);
     let [isCancelling, setIsCancelling] = useState(false);
 
+    let [isCancellingFailed, setIsCancellingFailed] = useState(false);
+    let [isCancellingSucceeded, setIsCancellingSucceeded] = useState(false);
+    let [isPaymentFailed, setIsPaymentFailed] = useState(false);
+    let [isPaymentSucceeded, setIsPaymentSucceeded] = useState(false);
+    const toggleIsCancellingFailed = () => setIsCancellingFailed(!isCancellingFailed);
+    const toggleIsCancellingSucceeded = () => setIsCancellingSucceeded(!isCancellingSucceeded);
+    const toggleIsPaymentFailed = () => setIsPaymentFailed(!isPaymentFailed);
+    const toggleIsPaymentSucceeded = () => setIsPaymentSucceeded(!isPaymentSucceeded);
+
     const handleCancelReservationClick = (event) => {
         event.preventDefault();
-
         setIsCancelling(true);
 
-        let reservations = JSON.parse(sessionStorage.getItem("reservations"));
-        reservations = reservations.filter((r) => {
-            return r.tripId !== reservation.tripId;
+        let request = new XMLHttpRequest();
+        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+reservation.tripId+'/cancel/', true);
+        request.addEventListener('load', (event) => {
+            setIsCancelling(false);
+            if(event.currentTarget.statusCode !== 200)
+                setIsCancellingFailed(true);
+            else 
+                setIsCancellingSucceeded(true);
+            setTimeout(() => window.location.reload(true), 3000);
         });
-        sessionStorage.setItem("reservations", JSON.stringify(reservations));
-
-        setIsCancelling(false);
-        alert('Reservation cancelled');
-        window.location.reload(true);
+        request.send();
     };
 
     const handlePayForReservationClick = (event) => {
-        setIsPaying(true);
         event.preventDefault();
-        setIsPaying(false);
+        setIsPaying(true);
+
+        let request = new XMLHttpRequest();
+        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+reservation.tripId+'/payment/', true);
+        request.addEventListener('load', (event) => {
+            setIsPaying(false);
+            if(event.currentTarget.statusCode !== 200)
+                setIsPaymentFailed(true);
+            else 
+                setIsPaymentSucceeded(true);
+        });
+        request.send();
     };
 
     return (
+        <div>
         <Card className="w-75 mx-auto p-3 shadow mb-3">
             <div className="row g-0">
                 <div className="col-md-6 my-auto">
@@ -79,7 +104,7 @@ const MyReservationsListElement = ({reservation}) => {
                                 </Button>
                             }
                         </div>
-                        <div> 
+                        {/* <div> 
                             {
                             isCancelling ?
                                 <Button type="submit" variant="outline-danger" className="w-100 disabled">
@@ -91,12 +116,18 @@ const MyReservationsListElement = ({reservation}) => {
                                     <FontAwesomeIcon icon={faXmark} className="fa-fw me-1" />
                                     Cancel reservation
                                 </Button>
-                            } 
-                        </div>
+                            }
+                        </div> */}
                     </Card.Body>
                 </div>
             </div>
         </Card>
+        {/* {isCancellingFailed ? <InfoToast variant="danger" content={"Cancelling reservation failed"} onClose={toggleIsCancellingFailed} /> : null} */}
+        {/* {isCancellingSucceeded ? <InfoToast variant="success" content={"Cancelling reservation succeeded"} onClose={toggleIsCancellingSucceeded} /> : null} */}
+        {isPaymentFailed ? <InfoToast variant="danger" content={"Payment for reservation failed"} onClose={toggleIsPaymentFailed} /> : null}
+        {isPaymentSucceeded ? <InfoToast variant="success" content={"Payment for reservation succeeded"} onClose={toggleIsPaymentSucceeded} /> : null}
+        </div>
     )
 }
+
 export default MyReservationsListElement;

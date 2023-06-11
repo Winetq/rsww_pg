@@ -4,6 +4,8 @@ import TripsListElement from "../components/TripsListElement";
 import TripsListElementSkeleton from "../components/TripsListElementSkeleton";
 import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
+import { useParams } from "react-router-dom";
+import InfoToast from "../components/InfoToast";
 
 
 const exampleTrips = {
@@ -44,15 +46,12 @@ const TripsList = () => {
     const urlBuilder = new UrlBuilder();
     const urlParams = new URLSearchParams(window.location.search);
     const url = new URL(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL'));
+
     for (const key of urlParams.keys())
         url.searchParams.append(key, urlParams.get(key));
 
     let {data, isPending, error} = useFetch(url.href);
-    if(!isPending) {
-        if(error)
-            console.warn(`Error occured: ${error}`);
-        data = data != null ? data.trips : exampleTrips.trips;
-    }
+    // data = exampleTrips.trips;
     
     const skeletonsArray = Array.from(Array(4).keys());
 
@@ -62,13 +61,16 @@ const TripsList = () => {
                 List of trips with selected filters
             </div>
 
-            {isPending?
+            { isPending ?
                 skeletonsArray.map((key) => (
                     <TripsListElementSkeleton key={key}/>
                 ))
             :
+            error ?
+                <InfoToast variant="danger" content={"Loading list of trips failed :( \"" + error + "\""} />
+            :
                 data.map(trip => (
-                    <TripsListElement trip={trip} key={trip.id}/>
+                    <TripsListElement trip={trip} key={trip.id} urlParams={url.searchParams.toString()}/>
                 ))
             }
         </div>

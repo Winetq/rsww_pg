@@ -6,11 +6,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faCalendar, faHotel, faCoins } from "@fortawesome/free-solid-svg-icons";
 
 
-export default function TripsListElement({ trip }) {
+export default function TripsListElement({ trip, urlParams }) {
 
     return (
         <Card className="w-75 mx-auto p-3 shadow mb-3">
-            <Link to={`/trips/${trip.id}/`} className="stretched-link" />
+            <Link to={`/trips/${trip.id}${urlParams ? "?"+urlParams : ""}`} className="stretched-link" />
             <div className="row g-0">
                 <div className="col-md-5 my-auto">
                     <Card.Img src={trip.hotel.photo} alt="Hotel Image" />
