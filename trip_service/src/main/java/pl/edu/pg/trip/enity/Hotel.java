@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import pl.edu.pg.trip.listener.events.HotelDetailsResponse;
+import pl.edu.pg.trip.listener.events.hotel.HotelDetailsResponse;
 
 import java.util.Set;
 

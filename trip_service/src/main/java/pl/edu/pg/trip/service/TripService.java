@@ -20,7 +20,6 @@ public class TripService {
     private final TripRepository tripRepository;
     private final DelegatingTransportService transportService;
     private final DelegatingHotelService hotelService;
-    private static boolean FIRST_REQUEST = true;
     @Autowired
     public TripService(final TripRepository tripRepository,
                        final DelegatingHotelService delegatingHotelService,
@@ -31,26 +30,10 @@ public class TripService {
     }
 
     public List<Trip> getTrips() {
-        if (FIRST_REQUEST) {
-            FIRST_REQUEST = true;
-            return populateWithTrips();
-        }
         return tripRepository.findAllTrips();
     }
 
     public Optional<Trip> getTrip(Long tripId) {
         return tripRepository.findTrip(tripId);
-    }
-
-    private List<Trip> populateWithTrips() {
-        final var hotels = hotelService.getHotels();
-        final var trips = hotels.stream()
-                .map(accommodation -> Trip.builder()
-                        .hotelId(accommodation.getId())
-                        .build())
-                .toList();
-
-        trips.forEach(tripRepository::save);
-        return trips;
     }
 }

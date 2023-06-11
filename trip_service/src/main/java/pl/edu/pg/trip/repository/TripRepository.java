@@ -26,7 +26,7 @@ public class TripRepository {
 
     public Optional<Trip> findTrip(final Long tripId) {
         final var query = new BasicDBObject();
-        query.put("_id", tripId);
+        query.put("tripId", tripId);
         return Optional.ofNullable(mongoDatabaseWrapper
                 .getDatabase()
                 .getCollection(TRIPS_COLLECTION, Trip.class)

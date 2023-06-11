@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.edu.pg.trip.listener.events.NotifyHotelAdded;
+import pl.edu.pg.trip.listener.events.hotel.NotifyHotelAdded;
 import pl.edu.pg.trip.service.TripService;
 
 @Component
@@ -21,6 +21,6 @@ public class AccommodationEventListener {
 
     @RabbitListener(queues = "#{autoDeleteQueue}")
     public void listenOnAccommodationUpdates(NotifyHotelAdded message) {
-        log.info("{}", message);
+        log.debug("{}", message);
     }
 }

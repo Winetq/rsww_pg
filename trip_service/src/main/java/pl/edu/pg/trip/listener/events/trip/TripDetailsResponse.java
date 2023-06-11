@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 import pl.edu.pg.trip.enity.Trip;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -22,6 +21,8 @@ public class TripDetailsResponse {
     private Hotel hotel;
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private Transport transport;
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private Transport returnTransport;
 
     @Data
     @Builder
@@ -57,24 +58,39 @@ public class TripDetailsResponse {
         private String arrivalAirport;
         private String departureDateTime;
         private String arrivalDate;
-        private Long travelTime;
-        private Long placesCount;
-        private Long placesOccupied;
+        private int travelTime;
+        private int placesCount;
+        private int placesOccupied;
     }
 
     public static Function<Trip, TripDetailsResponse> toDtoMapper(Supplier<Optional<pl.edu.pg.trip.enity.Hotel>> hotelSupplier,
-                                                                  Supplier<Optional<pl.edu.pg.trip.enity.Transport>> transportSupplier) {
+                                                                  Function<Long, Optional<pl.edu.pg.trip.enity.Transport>> transportAccessor) {
         return trip -> {
             final var maybeHotel = hotelSupplier.get();
-            final var maybeTransport = transportSupplier.get();
+            final var maybeTransport = transportAccessor.apply(trip.getStartFlightId());
+            final var maybeReturnTransport = transportAccessor.apply(trip.getEndFlightId());
+
             final var tripDetailsBuilder = TripDetailsResponse.builder();
             if (maybeTransport.isPresent()) {
                 final var transport = maybeTransport.get();
                 tripDetailsBuilder.transport(Transport.builder()
                         .departureAirport(transport.getDepartureAirport())
                         .arrivalAirport(transport.getArrivalAirport())
-                        .departureDateTime(transport.getDepartureDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")))
-                        .arrivalDate(transport.getArrivalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")))
+                        .departureDateTime(transport.getDepartureDate())
+                        .arrivalDate(transport.getArrivalDate())
+                        .travelTime(transport.getTravelTime())
+                        .placesCount(transport.getPlacesCount())
+                        .placesOccupied(transport.getPlacesOccupied())
+                        .build());
+            }
+
+            if (maybeReturnTransport.isPresent()) {
+                final var transport = maybeReturnTransport.get();
+                tripDetailsBuilder.returnTransport(Transport.builder()
+                        .departureAirport(transport.getDepartureAirport())
+                        .arrivalAirport(transport.getArrivalAirport())
+                        .departureDateTime(transport.getDepartureDate())
+                        .arrivalDate(transport.getArrivalDate())
                         .travelTime(transport.getTravelTime())
                         .placesCount(transport.getPlacesCount())
                         .placesOccupied(transport.getPlacesOccupied())

@@ -51,15 +51,21 @@ public class TripsResponse {
                             final var maybeHotel = hotelAccessor.apply(trip.getHotelId());
                             if (maybeHotel.isPresent()) {
                                 final var hotel = maybeHotel.get();
-                                tripBuilder.hotel(Hotel.builder().build());
+                                tripBuilder.hotel(Hotel.builder().id(hotel.getId())
+                                                .name(hotel.getName())
+                                                .stars(hotel.getStars())
+                                                .place(hotel.getPlace())
+                                                .photo(hotel.getPhoto())
+                                        .build());
                             }
-                            final var startTransport = transportAccessor.apply(trip.getStartFlightId());
-                            final var endTransport = transportAccessor.apply(trip.getEndFlightId());
 
                             tripBuilder.id(trip.getTripId())
-                                    .tripPrice(priceSupplier.get())
-                                    .dateStart(startTransport.get().getDepartureDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")))
-                                    .dateEnd(endTransport.get().getDepartureDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")));
+                                    .tripPrice(priceSupplier.get());
+
+                            final var startTransport = transportAccessor.apply(trip.getStartFlightId());
+                            final var endTransport = transportAccessor.apply(trip.getEndFlightId());
+                            startTransport.ifPresent(transport -> tripBuilder.dateStart(transport.getDepartureDate()));
+                            endTransport.ifPresent(transport -> tripBuilder.dateEnd(transport.getDepartureDate()));
 
 
                             return tripBuilder.build();

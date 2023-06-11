@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -14,9 +12,9 @@ import java.time.LocalDateTime;
 public class Transport {
     private String departureAirport;
     private String arrivalAirport;
-    private LocalDateTime arrivalDate;
-    private LocalDateTime departureDate;
-    private Long travelTime;
-    private Long placesCount;
-    private Long placesOccupied;
+    private String arrivalDate;
+    private String departureDate;
+    private int travelTime;
+    private int placesCount;
+    private int placesOccupied;
 }

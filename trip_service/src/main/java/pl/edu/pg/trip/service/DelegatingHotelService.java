@@ -9,11 +9,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import pl.edu.pg.trip.enity.Hotel;
-import pl.edu.pg.trip.enity.Transport;
-import pl.edu.pg.trip.listener.events.GetHotelRequest;
-import pl.edu.pg.trip.listener.events.GetHotelsRequest;
-import pl.edu.pg.trip.listener.events.GetHotelsResponse;
-import pl.edu.pg.trip.listener.events.HotelDetailsResponse;
+import pl.edu.pg.trip.listener.events.hotel.GetHotelRequest;
+import pl.edu.pg.trip.listener.events.hotel.GetHotelsRequest;
+import pl.edu.pg.trip.listener.events.hotel.GetHotelsResponse;
+import pl.edu.pg.trip.listener.events.hotel.HotelDetailsResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +46,7 @@ public class DelegatingHotelService {
         try {
             final var response = completableRequest.get();
             final var hotels = GetHotelsResponse.dtoToEntityMapper().apply(response);
-            logger.info("Fetched {} hotels.", hotels.size());
+            logger.debug("Fetched {} hotels.", hotels.size());
             return hotels;
         } catch (ExecutionException | InterruptedException e) {
              logger.error("Cannot get all hotels from hotel service.", e);
@@ -67,7 +66,7 @@ public class DelegatingHotelService {
         try {
             final var response = completableRequest.get();
             final var hotel = HotelDetailsResponse.dtoToEntityMapper().apply(response);
-            logger.info("Fetched hotel {}", hotel);
+            logger.debug("Fetched hotel {}", hotel);
             return Optional.of(hotel);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("Error when fetching hotel {} details.", id, e);
