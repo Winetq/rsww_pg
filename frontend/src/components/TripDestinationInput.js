@@ -7,14 +7,12 @@ import useFetch from "../hooks/useFetch";
 import UrlBuilder from "./UrlBuilder";
 
 
-const destinations = {
-    destinations: [
-        'Egipt',
-        'Turcja',
-        'Włochy',
-        'Hiszpania'
-    ]
-}
+const destinations = [
+    'Egipt',
+    'Turcja',
+    'Włochy',
+    'Hiszpania'
+]
 
 export default function TripDeparturePlaceInput({destination, setDestination}) {
     let urlBuilder = new UrlBuilder();
@@ -43,7 +41,7 @@ export default function TripDeparturePlaceInput({destination, setDestination}) {
                     isPending ?
                         null
                     :
-                        data.destinations.map((dest) => (
+                        data.map((dest) => (
                             <option value={dest} key={dest}>{dest}</option>
                         ))
                     }

@@ -8,14 +8,12 @@ import useFetch from "../hooks/useFetch";
 import UrlBuilder from "./UrlBuilder";
 
 
-const departurePlaces = {
-    departurePlaces: [
-        'Dojazd własny',
-        'Warszawa (WAW)',
-        'Gdańsk (GDA)',
-        'Kraków (KRA)'
-    ]
-}
+const departurePlaces = [
+    'Dojazd własny',
+    'Warszawa (WAW)',
+    'Gdańsk (GDA)',
+    'Kraków (KRA)'
+]
 
 export default function TripDeparturePlaceInput({departurePlace, setDeparturePlace}) {
     let urlBuilder = new UrlBuilder();
@@ -43,7 +41,7 @@ export default function TripDeparturePlaceInput({departurePlace, setDeparturePla
                     isPending ?
                         <option value="all" key="all">Any</option>
                     :
-                        data.departurePlaces.map((place) => (
+                        data.map((place) => (
                             <option value={place} key={place}>{place}</option>
                         ))
                     }

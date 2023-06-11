@@ -1,4 +1,4 @@
-package pl.edu.pg.trip.listener.events;
+package pl.edu.pg.trip.listener.events.trip;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;

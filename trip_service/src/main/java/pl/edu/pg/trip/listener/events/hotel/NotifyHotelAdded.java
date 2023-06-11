@@ -1,4 +1,4 @@
-package pl.edu.pg.trip.listener.events;
+package pl.edu.pg.trip.listener.events.hotel;
 
 import lombok.Builder;
 import lombok.Data;
