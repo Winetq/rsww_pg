@@ -131,5 +131,14 @@
         "travelTime": 65, // podane w minutach,
         "placesCount": 50, // liczba miejsc w samolocie
         "placesOccupied": 15 // liczba zajetych miejsc
-    }
+    },
+    "returnTransport": {
+        "departureAirport": "Paris (CDG)",
+        "arrivalAirport": "Warsaw (KOD)",
+        "departureDateTime": "30.06.2022 16:59",
+        "arrivalDate": "30.06.2022 18:00", // format dd.mm.yyyy hh:MM
+        "travelTime": 65, // podane w minutach,
+        "placesCount": 50, // liczba miejsc w samolocie
+        "placesOccupied": 15 // liczba zajetych miejsc
+    } 
 }

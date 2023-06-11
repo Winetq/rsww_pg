@@ -18,13 +18,13 @@ public class AddFlightCommandListener {
 
     private final FlightRepository repository;
     private final RabbitTemplate rabbitTemplate;
-    private final Queue eventDataStore;
+    private final Queue addFlightDataStore;
 
     @Autowired
-    public AddFlightCommandListener(FlightRepository repository, RabbitTemplate rabbitTemplate, Queue eventDataStore) {
+    public AddFlightCommandListener(FlightRepository repository, RabbitTemplate rabbitTemplate, Queue addFlightDataStore) {
         this.repository = repository;
         this.rabbitTemplate = rabbitTemplate;
-        this.eventDataStore = eventDataStore;
+        this.addFlightDataStore = addFlightDataStore;
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.queue.addFlightQueue}")
@@ -32,6 +32,6 @@ public class AddFlightCommandListener {
         AddFlightCommand command = message.getPayload();
         Flight flight = AddFlightCommand.commandToEntityMapper(command);
         Flight savedFlight = repository.save(flight);
-        rabbitTemplate.convertAndSend(eventDataStore.getName(), savedFlight);
+        rabbitTemplate.convertAndSend(addFlightDataStore.getName(), savedFlight);
     }
 }

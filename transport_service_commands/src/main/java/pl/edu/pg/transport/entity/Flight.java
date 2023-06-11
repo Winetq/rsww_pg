@@ -46,4 +46,8 @@ public class Flight {
         this.placesCount = placesCount;
         this.placesOccupied = 0;
     }
+
+    public void reservePlaces(int places) {
+        this.placesOccupied += places;
+    }
 }
