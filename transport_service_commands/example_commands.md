@@ -11,3 +11,26 @@
   "placesCount": 50
 }
 ```
+
+**Reserve flight**
+```json
+{
+  "flightId": 4,
+  "userId": 2,
+  "numberOfPeople": 10
+}
+```
+
+**Cancel flight**
+```json
+{
+  "reservationId": 4
+}
+```
+
+**Confirm flight**
+```json
+{
+  "reservationId": 4
+}
+```
