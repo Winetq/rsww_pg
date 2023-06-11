@@ -15,7 +15,7 @@ import pl.edu.pg.gateway.trip.dto.TripsResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/trips/")
+@RequestMapping("/api/trips")
 public class TripController {
 
     private final TripService tripService;
@@ -57,13 +57,13 @@ public class TripController {
     }
 
     @GetMapping
-    @RequestMapping("/destinations/")
+    @RequestMapping("/destinations")
     ResponseEntity<List<String>> getDestinations() {
         return ResponseEntity.ok(tripService.getDestinations());
     }
 
     @GetMapping
-    @RequestMapping("/departure-places/")
+    @RequestMapping("/departure-places")
     ResponseEntity<List<String>> getPossibleDepartures() {
         return ResponseEntity.ok(tripService.getPossibleDepartures());
     }

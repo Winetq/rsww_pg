@@ -1,5 +1,7 @@
 package pl.edu.pg.gateway.trip.dto;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
@@ -12,6 +14,7 @@ import java.util.List;
 public class TripDetailsResponse {
     private Hotel hotel;
     private Transport transport;
+    private Transport returnTransport;
 
     @Data
     @Builder
