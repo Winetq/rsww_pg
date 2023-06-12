@@ -33,17 +33,20 @@ def getFoodInfo(offerPage):
         .find_all("article", class_="OfferDetailsBlock_offerDetailsBlock__EX2Zv")
     foodTitle = [0] * len(foodInformations)
     for i in range(len(foodInformations)):
-        foodTitle[i] = foodInformations[i].find("h3", class_="heading").text.strip()
+        foodTitle[i] = foodInformations[i].find("h3", class_="heading")
+        if foodTitle[i]:
+            foodTitle[i] = foodTitle[i].text.strip()
     food = "none"
     for i in range(len(foodTitle)):
-        if "all inclusive" in foodTitle[i].lower():
-            food += "|all-inclusive"
-        elif "trzy posiłki" in foodTitle[i].lower():
-            food += "|three-dishes"
-        elif "dwa posiłki" in foodTitle[i].lower():
-            food += "|two-dishes"
-        elif "śniadanie" in foodTitle[i].lower():
-            food += "|breakfast"
+        if foodTitle[i]:
+            if "all inclusive" in foodTitle[i].lower():
+                food += "|all-inclusive"
+            elif "trzy posiłki" in foodTitle[i].lower():
+                food += "|three-dishes"
+            elif "dwa posiłki" in foodTitle[i].lower():
+                food += "|two-dishes"
+            elif "śniadanie" in foodTitle[i].lower():
+                food += "|breakfast"
     return food
 
 
@@ -63,42 +66,49 @@ def getRoomNumber(offerPage):
 
 def getRoomInfo(offerPage, stars):
     roomNumber = getRoomNumber(offerPage)
-    roomInformations = offerPage.find("div", {"id": "accordion__body-ROOMS"}) \
-        .find_all("article", class_="OfferDetailsBlock_offerDetailsBlock__EX2Zv")
-    roomTitle = [0] * len(roomInformations)
-    features = [""] * len(roomInformations)
-    capacity = [0] * len(roomInformations)
-    for i in range(len(roomInformations)):
-        roomTitle[i] = roomInformations[i].find("h3", class_="heading").text.strip()
+    roomInformations = offerPage.find("div", {"id": "accordion__body-ROOMS"})
+    if roomInformations:
+        roomInformations = roomInformations.find_all("article", class_="OfferDetailsBlock_offerDetailsBlock__EX2Zv")
+        roomTitle = [0] * len(roomInformations)
+        features = [""] * len(roomInformations)
+        capacity = [0] * len(roomInformations)
+        for i in range(len(roomInformations)):
+            roomTitle[i] = roomInformations[i].find("h3", class_="heading")
+            if roomTitle[i]:
+                roomTitle[i] = roomTitle[i].text.strip()
 
-        roomFeatures = \
-            roomInformations[i].find_all("li", class_="OfferDetailsBlock_offerDetailsBlockFeature__Xztov")
-        for j in range(len(roomFeatures)):
-            if "liczba osób" in \
-                    roomFeatures[j].find("span", class_="OfferDetailsBlock_offerDetailsBlockFeatureName__cviXr").text:
-                capacity[i] = len(roomFeatures[j].find_all("svg"))
-                break
-        if capacity[i] == 0:
-            capacity[i] = random.randrange(2, 4)
+                roomFeatures = \
+                    roomInformations[i].find_all("li", class_="OfferDetailsBlock_offerDetailsBlockFeature__Xztov")
+                for j in range(len(roomFeatures)):
+                    if "liczba osób" in \
+                            roomFeatures[j].find("span", class_="OfferDetailsBlock_offerDetailsBlockFeatureName__cviXr").text:
+                        capacity[i] = len(roomFeatures[j].find_all("svg"))
+                        break
+                if capacity[i] == 0:
+                    capacity[i] = random.randrange(2, 4)
 
-        roomContent = \
-            roomInformations[i].find_all("li", class_="OfferDetailsBlock_offerDetailsBlockSpecsListItem--room__Pg3R4")
-        for j in range(len(roomContent)):
-            features[i] += roomContent[j].find("span").text.strip()
-            if j < len(roomContent) - 1:
-                features[i] += "|"
+                roomContent = \
+                    roomInformations[i].find_all("li", class_="OfferDetailsBlock_offerDetailsBlockSpecsListItem--room__Pg3R4")
+                for j in range(len(roomContent)):
+                    features[i] += roomContent[j].find("span").text.strip()
+                    if j < len(roomContent) - 1:
+                        features[i] += "|"
+            else:
+                return None
 
-    rooms = [0] * len(roomTitle)
-    numberOfRooms = roomNumber // len(rooms)
-    for i in range(len(rooms)):
-        if i == len(rooms) - 1:
-            numberOfRooms = roomNumber - numberOfRooms * (len(rooms) - 1)
-        basePrice = 40 * stars + 10 * capacity[i]
-        if "apartament" in roomTitle[i].lower():
-            basePrice *= 1.2
-        rooms[i] = templates.RoomTemplate(name=roomTitle[i], capacity=capacity[i], features=features[i],
-                                          numberOfRooms=numberOfRooms, basePrice=float(int(basePrice)))
-    return rooms
+        rooms = [0] * len(roomTitle)
+        numberOfRooms = roomNumber // len(rooms)
+        for i in range(len(rooms)):
+            if i == len(rooms) - 1:
+                numberOfRooms = roomNumber - numberOfRooms * (len(rooms) - 1)
+            basePrice = 40 * stars + 10 * capacity[i]
+            if "apartament" in roomTitle[i].lower():
+                basePrice *= 1.2
+            rooms[i] = templates.RoomTemplate(name=roomTitle[i], capacity=capacity[i], features=features[i],
+                                              numberOfRooms=numberOfRooms, basePrice=float(int(basePrice)))
+        return rooms
+    else:
+        return None
 
 
 def getHotelImages(offerPage, imageNumber):
@@ -134,6 +144,8 @@ def getHotelAirportBasedOnCountry(country):
         for airportName, airportCountry in airports.items():
             if airportCountry == country:
                 hotelAirports += [airportName]
+        if len(hotelAirports) <= 0:
+            return None
         hotelAirport = random.choice(hotelAirports)
 
     return hotelAirport
