@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
@@ -14,6 +14,7 @@ import TripRoomsElement from "../components/TripRoomsElement";
 import TripFoodElement from "../components/TripFoodElement";
 import InfoToast from "../components/InfoToast";
 import AuthContext from "../context/AuthContext";
+import NotificationToast from "../components/NotificationToast";
 
 
 const trip = {
@@ -84,6 +85,8 @@ const TripDetails = () => {
         return false;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+
     const { id } = useParams();
 
     const {user} = useContext(AuthContext);
@@ -149,6 +152,26 @@ const TripDetails = () => {
         data.hotel.rooms.forEach((room, idx) => {
             data.hotel.rooms[idx].key = idx;
         });
+
+    let [notification, setNotification] = useState(() => null);
+    const notifyDelay = 2*1000;
+
+    useEffect(() => {
+        const notifyInterval = setInterval(async () => {
+            setNotification(null);
+
+            const notify = await fetch("/api/trip-update?tripId="+id+"&"+urlParams);
+            try{
+                let notifyResponse = await notify.json();
+                setNotification(notifyResponse.responseText);
+            } catch {
+                setNotification('Could not parse notification :(');
+                return;
+            }
+        }, notifyDelay);
+        
+        return () => clearInterval(notifyInterval);
+    }, []);
 
     return (
         isPending ? 
@@ -278,6 +301,7 @@ const TripDetails = () => {
         {isReservationFailed ? <InfoToast variant="danger" content={"Reserving trip failed"} onClose={toggleIsReservationFailed} /> : null}
         {isReservationSucceeded ? <InfoToast variant="success" content={"Trip has been reserved"} onClose={toggleIsReservationSucceeded} /> : null}
         {isSelectingFailed ? <InfoToast variant="danger" content={"Please select room and food before making reservation"} onClose={toggleIsSelectingFailed} /> : null}
+        {notification ? <NotificationToast variant="warning" content={notification} /> : null}
         </div>
     )
 }

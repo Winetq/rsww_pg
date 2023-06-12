@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import TripsListElement from "../components/TripsListElement";
 import TripsListElementSkeleton from "../components/TripsListElementSkeleton";
@@ -6,6 +6,7 @@ import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
 import { useParams } from "react-router-dom";
 import InfoToast from "../components/InfoToast";
+import NotificationToast from "../components/NotificationToast";
 
 
 const exampleTrips = {
@@ -53,6 +54,26 @@ const TripsList = () => {
     let {data, isPending, error} = useFetch(url.href);
     // data = exampleTrips.trips;
     
+    let [notification, setNotification] = useState(() => null);
+    const notifyDelay = 2*1000;
+
+    useEffect(() => {
+        const notifyInterval = setInterval(async () => {
+            setNotification(null);
+
+            const notify = await fetch("/api/trip-update?"+urlParams.toString());
+            try{
+                let notifyResponse = await notify.json();
+                setNotification(notifyResponse.responseText);
+            } catch {
+                setNotification('Could not parse notification :(');
+                return;
+            }
+        }, notifyDelay);
+      
+        return () => clearInterval(notifyInterval);
+    }, []);
+
     const skeletonsArray = Array.from(Array(4).keys());
 
     return (
@@ -73,6 +94,8 @@ const TripsList = () => {
                     <TripsListElement trip={trip} key={trip.id} urlParams={url.searchParams.toString()}/>
                 ))
             }
+
+            {notification ? <NotificationToast variant="warning" content={notification} /> : null}
         </div>
     )
     

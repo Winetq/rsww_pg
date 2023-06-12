@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,11 +9,12 @@ import TripDestinationInput from "../components/TripDestinationInput";
 import TripDateInput from "../components/TripDateInput";
 import TripDeparturePlaceInput from "../components/TripDeparturePlaceInput";
 import TripPeopleCollapse from "../components/TripPeopleCollapse";
-import TripsListElement from "../components/TripsListElement";
 import TripsListElementSkeleton from "../components/TripsListElementSkeleton";
 import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
 import InfoToast from "../components/InfoToast";
+import LatestTOChangesTable from "../components/LatestTOChangesTable";
+
 
 const trips = {
     trips: [
@@ -63,19 +64,7 @@ const Home = () => {
     const navigate = useNavigate();
     const urlBuilder = new UrlBuilder();
 
-    let {data: destinations, isPending: isDestinationsPending, error: destinationsError} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_DESTINATIONS_URL'));
-    let {data: departurePlaces, isPending: isDeparturePlacesPending, error: departurePlacesError} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_DEPARTURE_PLACES_URL'));
-
-    destinations = destinations == null ? ['Egipt', 'Turcja'] : destinations;
-    departurePlaces = departurePlaces == null ? ['Warszawa (WAW)', 'Gdańsk (GDA)'] : departurePlaces;
-    let {data: exampleTrips, isPending: isExampleTripsPending, error: exampleTripsError} = useFetch(
-        urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+`?destination=${destinations[0]}&departurePlace=${departurePlaces[0]}&startDate=${(new Date()).toISOString().substring(0, 10)}&peopleOver18=2`
-    );
-
-    // if(!isExampleTripsPending) {
-    //     exampleTrips = trips.trips;
-    //     exampleTrips = exampleTrips != null ? exampleTrips : trips.trips;
-    // }
+    let {data: latestTOChanges, isPending: isLatestTOChangesPending, error: latestTOChangesError} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL')+'to-updates');
 
     let zeroPader = (number) => {
         if(number < 10)
@@ -153,23 +142,17 @@ const Home = () => {
             </Form>
 
             <div className="fw-bold fs-3 mb-3 border-bottom pb-1 text-info">
-                Examples of trips You could buy
+                10 latest changes of Tour Operator
             </div>
             <div className="mt-2">
-                {
-                    exampleTrips ? 
-                    exampleTrips.map(trip => (
-                        <TripsListElement trip={trip} key={trip.id} />
-                    ))
-                    :
-                    <TripsListElementSkeleton />    
+                {isLatestTOChangesPending ?
+                    <TripsListElementSkeleton />
+                : latestTOChangesError ?
+                    <InfoToast variant="danger" content={"Loading TO latest changes failed. Handled error: \"" + latestTOChangesError + "\""} />
+                :
+                    <LatestTOChangesTable changes={latestTOChanges} />
                 }
             </div>
-            {!isExampleTripsPending && exampleTripsError ?
-                <InfoToast variant="danger" content={"Loading example trips failed :( \"" + exampleTripsError + "\""} />
-            :
-                null
-            }
         </div>
     )
 }
