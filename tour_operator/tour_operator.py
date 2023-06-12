@@ -63,7 +63,6 @@ class TourOperator:
         message = json.loads(json.dumps(hotel))
         self.channel.basic_publish(exchange='', routing_key=self.add_hotel_queue, body=message)
 
-        time.sleep(2)
         hotel = HotelDetails(hotel)
         hotels = GetHotelsEvent(self.channel, self.callback_queue).hotels
         hotel = [h for h in hotels if h.compare(hotel)]
@@ -79,7 +78,6 @@ class TourOperator:
         message = json.loads(json.dumps(flight))
         self.channel.basic_publish(exchange='', routing_key=self.add_flight_queue, body=message)
 
-        time.sleep(2)
         flights = GetFlightsEvent(self.channel, self.callback_queue).flights
         flight = [f for f in flights if f.compare(flight)]
         if len(flight) > 0:
@@ -165,7 +163,7 @@ class TourOperator:
 
 if __name__ == "__main__":
     tour_operator = TourOperator()
-    Initializer(tour_operator)
+    Initializer(tour_operator, 5)
     # print("Start of generating changes by TO")
     # tour_operator.generate()
     # tour_operator.close_connection()
