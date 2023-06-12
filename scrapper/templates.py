@@ -15,7 +15,7 @@ class HotelTemplate:
         self.rooms = rooms
         self.airport = airport
 
-    def to_json(self):
+    def save(self):
         hotel = {
             "name": self.name,
             "country": self.country,
@@ -63,6 +63,7 @@ class FlightTemplate:
         travel_min = travel_hour[1].split("min")
         self.travel_time = int(travel_time[0]) * 60 + int(travel_min[0])
         self.placesCount = 150
+        self.price = random.randrange(start=100, stop=600)
 
     def getDates(self, departure_time, arrival_time, date):
         dateDate = date.split(".")
@@ -78,14 +79,15 @@ class FlightTemplate:
         arrival_date = arrival_date.strftime("%d.%m.%Y %H:%M")
         return departure_date, arrival_date
 
-    def to_json(self):
+    def save(self):
         flight = {
-            "departure_airport": self.departure_airport,
-            "arrival_airport": self.arrival_airport,
-            "departure_date": self.departure_date,
-            "arrival_date": self.arrival_date,
-            "travel_time": self.travel_time,
-            "placesCount": self.placesCount
+            "departureAirport": self.departure_airport,
+            "arrivalAirport": self.arrival_airport,
+            "departureDate": self.departure_date,
+            "arrivalDate": self.arrival_date,
+            "travelTime": self.travel_time,
+            "placesCount": self.placesCount,
+            "price": self.price
         }
 
         with open('data/flights.json', 'a') as outfile:

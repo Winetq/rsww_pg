@@ -53,7 +53,7 @@ class FlightScrapper:
                         buttonMore = buttonMore.find_element(By.CLASS_NAME, "button")
                         if buttonMore is not None:
                             driver.execute_script("arguments[0].click();", buttonMore)
-                            time.sleep(2)
+                            time.sleep(2.5)
 
                 flightsPage = Soup(driver.page_source, 'lxml').find_all("div", class_="charters-offers-list__item")
                 flights = []
@@ -63,7 +63,7 @@ class FlightScrapper:
                     flights += flight
 
                 for flight in flights:
-                    flight.to_json()
+                    flight.save()
                 sum += len(flights)
 
         except TimeoutException:

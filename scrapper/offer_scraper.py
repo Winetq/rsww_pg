@@ -61,7 +61,7 @@ class OfferScrapper:
 
                     hotelTemplate = \
                         templates.HotelTemplate(name, country, city, stars, description, food, photo, rooms, airport)
-                    hotelTemplate.to_json()
+                    hotelTemplate.save()
                     offersNumber += 1
 
         except TimeoutException:
