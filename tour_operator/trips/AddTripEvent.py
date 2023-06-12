@@ -9,8 +9,8 @@ class AddTripEvent:
 
     def getAddTripMessage(self):
         trip = {
-            "hotelId": self.hotelId,
-            "startFlightId": self.startFlightId,
-            "endFlightId": self.endFlightId
+            "hotelId": int(self.hotelId),
+            "startFlightId": int(self.startFlightId),
+            "endFlightId": int(self.endFlightId)
         }
-        return json.loads(trip)
+        return json.dumps(trip)

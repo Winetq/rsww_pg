@@ -9,4 +9,4 @@ class GetHotelsEvent:
         self.get_hotels_queue = os.environ.get('GET_HOTELS_QUEUE', 'GetHotelsQueue')
         hotels = json.loads(send_message_and_get_response(channel, self.get_hotels_queue, callback_queue))
         if hotels is not None and hotels is not []:
-            self.hotels = [Hotel(hotel) for hotel in hotels["hotels"]]
+            self.hotels = [Hotel(json.dumps(hotel)) for hotel in hotels["hotels"]]
