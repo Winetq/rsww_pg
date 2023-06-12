@@ -13,6 +13,7 @@ import TripsListElement from "../components/TripsListElement";
 import TripsListElementSkeleton from "../components/TripsListElementSkeleton";
 import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
+import InfoToast from "../components/InfoToast";
 
 const trips = {
     trips: [
@@ -70,18 +71,27 @@ const Home = () => {
     let {data: exampleTrips, isPending: isExampleTripsPending, error: exampleTripsError} = useFetch(
         urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+`?destination=${destinations[0]}&departurePlace=${departurePlaces[0]}&startDate=${(new Date()).toISOString().substring(0, 10)}&peopleOver18=2`
     );
-    if(!isExampleTripsPending) {
-        exampleTrips = exampleTrips != null ? exampleTrips : trips.trips;
+
+    // if(!isExampleTripsPending) {
+    //     exampleTrips = trips.trips;
+    //     exampleTrips = exampleTrips != null ? exampleTrips : trips.trips;
+    // }
+
+    let zeroPader = (number) => {
+        if(number < 10)
+            return "0"+number;
+        else
+            return ""+number 
     }
 
     let handleSubmit = (event) => {
         event.preventDefault();
-
+        const startDateObj = new Date(Date.parse(startDate));
         let urlParams = `?destination=${destination}&` + 
-            `startDate=${startDate}&` +
-            `people3To9=${people3To9}` + 
-            `people10To17=${people10To17}` + 
-            `adults=${peopleOver18}` + 
+            `startDate=${zeroPader(startDateObj.getDate()) + "." + zeroPader(startDateObj.getMonth()+1) + "." + startDateObj.getFullYear()}&` +
+            `people3To9=${people3To9}&` + 
+            `people10To17=${people10To17}&` + 
+            `adults=${peopleOver18}&` + 
             `departurePlace=${departurePlace}`;
         navigate('/trips' + urlParams);
     }
@@ -155,6 +165,11 @@ const Home = () => {
                     <TripsListElementSkeleton />    
                 }
             </div>
+            {!isExampleTripsPending && exampleTripsError ?
+                <InfoToast variant="danger" content={"Loading example trips failed :( \"" + exampleTripsError + "\""} />
+            :
+                null
+            }
         </div>
     )
 }

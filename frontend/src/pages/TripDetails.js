@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
@@ -12,6 +12,8 @@ import {
 import { Button } from "react-bootstrap";
 import TripRoomsElement from "../components/TripRoomsElement";
 import TripFoodElement from "../components/TripFoodElement";
+import InfoToast from "../components/InfoToast";
+import AuthContext from "../context/AuthContext";
 
 
 const trip = {
@@ -37,13 +39,11 @@ const trip = {
         "photo": "https://r.cdn.redgalaxy.com/scale/o2/TUI/hotels/NBE16043/S22/19905149.jpg?dstw=1200&dsth=644.0795159896282&srcw=1157&srch=621&srcx=1%2F2&srcy=1%2F2&srcmode=3&type=1&quality=80",
         "rooms": [ // dostępne pokoje, wedlug typu
             {
-                "key": 1,
                 "capacity": 4, // max liczba osob w pokoju
                 "name": "Pokój 4-osobowy", // nazwa widoczna na karcie
                 "features": "klimatyzacja|TV|telefon" // lista zapisana w formacie string oddzielona |
             },
             {
-                "key": 2,
                 "capacity": 6, // max liczba osob w pokoju
                 "name": "Pokój 6-osobowy", // nazwa widoczna na karcie
                 "features": "klimatyzacja|TV|telefon|suszarka|lodówka" // lista zapisana w formacie string oddzielona |
@@ -57,6 +57,15 @@ const trip = {
         "arrivalAirport": "Paris (CDG)",
         "departureDateTime": "26.06.2022 16:59",
         "arrivalDate": "26.06.2022 18:00", // format dd.mm.yyyy hh:MM
+        "travelTime": 65, // podane w minutach,
+        "placesCount": 50, // liczba miejsc w samolocie
+        "placesOccupied": 15 // liczba zajetych miejsc
+    },
+    returnTransport: {
+        "arrivalAirport": "Warsaw (KOD)",
+        "departureAirport": "Paris (CDG)",
+        "departureDateTime": "30.06.2022 16:59",
+        "arrivalDate": "30.06.2022 18:00", // format dd.mm.yyyy hh:MM
         "travelTime": 65, // podane w minutach,
         "placesCount": 50, // liczba miejsc w samolocie
         "placesOccupied": 15 // liczba zajetych miejsc
@@ -77,46 +86,77 @@ const TripDetails = () => {
 
     const { id } = useParams();
 
+    const {user} = useContext(AuthContext);
     let [room, setRoom] = useState(null);
     let [food, setFood] = useState(null);
     let [reserved, setReserved] = useState(() => checkReservation());
     let [isReserving, setIsReserving] = useState(false);
 
-    const urlBuilder = new UrlBuilder();
-    let {data, isPending, error} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL', id));
-    if(!isPending && data == null)
-        data = trip;
+    let [isSelectingFailed, setIsSelectingFailed] = useState(false);
+    let [isReservationSucceeded, setIsReservationSucceeded] = useState(false);
+    let [isReservationFailed, setIsReservationFailed] = useState(false);
+    const toggleIsSelectingFailed = () => setIsSelectingFailed(!isSelectingFailed);
+    const toggleIsReservationSucceeded = () => setIsReservationSucceeded(!isReservationSucceeded);
+    const toggleIsReservationFailed = () => setIsReservationFailed(!isReservationFailed);
 
-    let handleClickReserveTrip = (event) => {
+    const urlBuilder = new UrlBuilder();
+    let {data, isPending, error} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+id);
+    // data = trip;
+    
+    let handleClickReserveTrip = async (event) => {
         event.preventDefault();
         
         if(room == null || food == null) {
-            alert('Please select room and food before making reservation');
+            setIsSelectingFailed(true);
             return;
         }
         setIsReserving(true);
 
-        let reservations = sessionStorage.getItem('reservations');
-        if(reservations == null)
-            reservations = [];
-        else
-            reservations = JSON.parse(reservations);
-        
-        reservations.push({
-            tripId: id,
-            trip: data,
-            room: room,
-            food: food
-        });
-        sessionStorage.setItem('reservations', JSON.stringify(reservations));
+        let request = new XMLHttpRequest();
+        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+id+'/reserve/', true);
+        request.addEventListener('load', (event) => {
+            if(event.currentTarget.statusCode !== 202){
+                setIsReservationFailed(true);
+            } else {
+                let reservations = sessionStorage.getItem('reservations');
+                if(reservations == null)
+                    reservations = [];
+                else
+                    reservations = JSON.parse(reservations);
+                
+                reservations.push({
+                    tripId: id,
+                    trip: data,
+                    room: room,
+                    food: food
+                });
+                sessionStorage.setItem('reservations', JSON.stringify(reservations));
 
-        setReserved(true);
-        setIsReserving(false);
-        alert('Trip has been reserved');
+                setReserved(true);
+                setIsReservationSucceeded(true);
+            }
+            setIsReserving(false);
+        });
+        request.send(JSON.stringify({
+            "user": user.user_id,
+            "tripId": id,
+            "food": food,
+            "room": room,
+        }));
     }
 
+    if(!isPending && !error && data)
+        data.hotel.rooms.forEach((room, idx) => {
+            data.hotel.rooms[idx].key = idx;
+        });
+
     return (
-        isPending ? <TripsListElementSkeleton className="my-3" /> :
+        isPending ? 
+            <TripsListElementSkeleton className="my-3" /> 
+        :
+        error ?
+            <InfoToast variant="danger" content={"Loading details of trip has failed :( \"" + error + "\""} />
+        :
 
         <div className="tripDetails">
         <div className="my-3 row shadow rounded py-4 px-3 gx-4">
@@ -235,6 +275,9 @@ const TripDetails = () => {
                 </div>
             </div>
         </div>
+        {isReservationFailed ? <InfoToast variant="danger" content={"Reserving trip failed"} onClose={toggleIsReservationFailed} /> : null}
+        {isReservationSucceeded ? <InfoToast variant="success" content={"Trip has been reserved"} onClose={toggleIsReservationSucceeded} /> : null}
+        {isSelectingFailed ? <InfoToast variant="danger" content={"Please select room and food before making reservation"} onClose={toggleIsSelectingFailed} /> : null}
         </div>
     )
 }

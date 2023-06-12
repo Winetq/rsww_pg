@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.edu.pg.gateway.transport.dto.GetFlightDetailsQuery;
 import pl.edu.pg.gateway.transport.dto.GetFlightDetailsResponse;
-import pl.edu.pg.gateway.transport.dto.GetFlightWithParametersQuery;
+import pl.edu.pg.gateway.transport.dto.GetFlightsWithParametersQuery;
 import pl.edu.pg.gateway.transport.dto.GetFlightsQuery;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
 class TransportService {
     private final RabbitTemplate rabbitTemplate;
     private static final String GET_FLIGHT_DETAILS_QUEUE = "GetFlightDetailsQueue";
-    private static final String GET_FLIGHT_WITH_PARAMETERS_QUEUE = "GetFlightWithParametersQueue";
+    private static final String GET_FLIGHTS_WITH_PARAMETERS_QUEUE = "GetFlightsWithParametersQueue";
     private static final String GET_FLIGHTS_QUEUE = "GetFlightsQueue";
 
     @Autowired
@@ -41,14 +41,14 @@ class TransportService {
     }
 
     ResponseEntity<List<GetFlightDetailsResponse>> getFlights(String departureAirport, String arrivalAirport, String departureDate, String arrivalDate) {
-        GetFlightWithParametersQuery query = GetFlightWithParametersQuery.builder()
+        GetFlightsWithParametersQuery query = GetFlightsWithParametersQuery.builder()
                 .departureAirport(departureAirport)
                 .arrivalAirport(arrivalAirport)
                 .departureDate(departureDate)
                 .arrivalDate(arrivalDate)
                 .build();
         List<GetFlightDetailsResponse> response = rabbitTemplate.convertSendAndReceiveAsType(
-                GET_FLIGHT_WITH_PARAMETERS_QUEUE,
+                GET_FLIGHTS_WITH_PARAMETERS_QUEUE,
                 query,
                 new ParameterizedTypeReference<>() {
                 });

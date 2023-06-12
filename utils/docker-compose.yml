@@ -172,4 +172,15 @@ services:
       - RABBIT_PORT=5672
       - RABBIT_USR=guest
       - RABBIT_PWD=guest
+
+  tour_operator:
+    container_name: tour_operator
+    build:
+      context: ../tour_operator
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+    environment:
+      - AMQP_URL=rabbitmq
+      - REJECTION_PROBABILITY=10
       

@@ -17,6 +17,7 @@ public class GetFlightDetailsResponse {
     private final int travelTime;
     private final int placesCount;
     private final int placesOccupied;
+    private final int price;
 
     public static Function<Flight, GetFlightDetailsResponse> entityToDtoMapper() {
         return flight -> GetFlightDetailsResponse
@@ -29,6 +30,7 @@ public class GetFlightDetailsResponse {
                 .travelTime(flight.getTravelTime())
                 .placesCount(flight.getPlacesCount())
                 .placesOccupied(flight.getPlacesOccupied())
+                .price(flight.getPrice())
                 .build();
     }
 }

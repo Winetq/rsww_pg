@@ -2,21 +2,21 @@
 {
     "name": "Samira Club Spa & Aquapark",
     "country": "Tunezja",
-    "city": "Hammamet", // moze byc "" jesli nie bedzie miasta
-    "stars": 3, // integer 0 - 5, 0 jesli nie ma danych
+    "city": "Hammamet", 
+    "stars": 3, 
     "description": "...",
-    "photo": "url2", // to samo na miniaturke co na glowne
-    "rooms": [ // dostępne pokoje, wedlug typu
+    "photo": "url2", 
+    "rooms": [ 
         {
-            "capacity": 4, // max liczba osob w pokoju
-            "name": "Pokój 2-osobowy", // nazwa widoczna na karcie
-            "features": "klimatyzacja|TV|telefon", // lista zapisana w formacie string oddzielona |
+            "capacity": 4, 
+            "name": "Pokój 2-osobowy",
+            "features": "klimatyzacja|TV|telefon",
             "numberOfRooms": 20,
             "basePrice": 240.50
         }
     ],
     "airport": "Paris (CDG)",
-    "food": "none|breakfast|two-dishes|three-dishes|all-inclusive" // enum, minimum jedna z tych opcji, może nie być wcale
+    "food": "none|breakfast|two-dishes|three-dishes|all-inclusive" 
 }
 
 // Add flight (idzie do transport service) //CreateFlightQueue
@@ -24,34 +24,39 @@
     "departureAirport": "Warsaw (KOD)",
     "arrivalAirport": "Paris (CDG)",
     "departureDate": "26.06.2022 16:59",
-    "arrivalDate": "26.06.2022 18:00", // format dd.mm.yyyy hh:MM
-    "travelTime": 65, // podane w minutach,
-    "placesCount": 50
+    "arrivalDate": "26.06.2022 18:00", 
+    "travelTime": 65, 
+    "placesCount": 50,
+    "price": 490
 }
 
-
-
-// Raczej nie potrzebujemy typowo wysyłać jednego pokoju albo wielu pokoi do frontu
-
 // Rezerwacja pokoju -> co front wysyła do api gateway
-{ // dodanie wycieczki do koszyka
+ReserveTripQueue
+ReserveTrip
+{
     "user": "USER10001",
     "accommodation": {
         "hotel": 1000,
         "room": {
-            "capacity": 4, // max liczba osob w pokoju
-            "name": "Pokój 4-osobowy", // nazwa widoczna na karcie
-            "features": "klimatyzacja|TV|telefon" // lista zapisana w formacie string oddzielona |
+            "capacity": 4, 
+            "name": "Pokój 4-osobowy", 
+            "features": "klimatyzacja|TV|telefon" 
         }, 
         "startDate": 21.06.2000,
         "endDate": 28.06.2000,
-        "numberOfPeople": 2 // możesz wziąć wiekszy pokój dla mniejszej liczby osób
+        "numberOfPeople": 2
     }
-    "transport": { // moze nie wystepowac jako pole zadania - wtedy transport wlasny
+    "transport": { 
         "departureAirport": "Warsaw (KOD)",
         "arrivalAirport": "Paris (CDG)",
         "departureDateTime": "26.06.2022 16:59",
-        "numberOfPlaces": 5 // liczba rezerwowanych miejsc
+        "numberOfPlaces": 2 
+    },
+    "returnTransport": { 
+        "departureAirport": "Paris (CDG)",
+        "arrivalAirport": "Warsaw (KOD)",
+        "departureDateTime": "30.06.2022 16:59",
+        "numberOfPlaces": 2 
     }
 }
 
@@ -60,15 +65,15 @@
     "departureAirport": "Warsaw (KOD)",
     "arrivalAirport": "Paris (CDG)",
     "departureDate": "26.06.2022 16:59",
-    "arrivalDate": "26.06.2022 18:00", // format dd.mm.yyyy hh:MM
-    "travelTime": 65, // podane w minutach,
-    "placesCount": 50, // liczba miejsc w samolocie
-    "placesOccupied": 15 // liczba zajetych miejsc
+    "arrivalDate": "26.06.2022 18:00", 
+    "travelTime": 65, 
+    "placesCount": 50, 
+    "placesOccupied": 15 
 }
 
 // GET TRIPS REQUEST
 //
-{ // kazde z nich jako path params nie jako body!!!!
+{ 
     "destCountry"
     "destCity"    
     "starDate"    
@@ -87,11 +92,11 @@
                 "id": 1,
                 "name": "Samira Club Spa & Aquapark",
                 "stars": 3,
-                "place": "Kraj / Miasto", // concat kraju i miasta
+                "place": "Kraj / Miasto",
                 "photo": "photourl",
 
             },
-            "tripPrice": 1800, // ca
+            "tripPrice": 1800, 
             "dateStart": "26.06.2022 16:59",
             "dateEnd": "28.06.2022 16:59"
         }
@@ -109,28 +114,28 @@
         "id": 1000,
         "name": "",
         "country": "",
-        "city": "", // may be null/empty
-        "stars": 3, // integer 0 - 5, 0 jesli nie ma danych
+        "city": "",
+        "stars": 3, 
         "description": "...",
-        "photo": "url2", // to samo na miniaturke co na glowne
-        "rooms": [ // dostępne pokoje, wedlug typu
+        "photo": "url2", 
+        "rooms": [ 
             {
-                "capacity": 4, // max liczba osob w pokoju
-                "name": "Pokój 2-osobowy", // nazwa widoczna na karcie
-                "features": "klimatyzacja|TV|telefon" // lista zapisana w formacie string oddzielona |
+                "capacity": 4, 
+                "name": "Pokój 2-osobowy", 
+                "features": "klimatyzacja|TV|telefon"
             }
         ],
         "airport": "Paris [CDG]",
-        "food": "none|breakfast|two-dishes|three-dishes|all-inclusive" // enum, minimum jedna z tych opcji, może nie być wcale
+        "food": "none|breakfast|two-dishes|three-dishes|all-inclusive" 
     }
     "transport": {
         "departureAirport": "Warsaw (KOD)",
         "arrivalAirport": "Paris (CDG)",
         "departureDateTime": "26.06.2022 16:59",
-        "arrivalDate": "26.06.2022 18:00", // format dd.mm.yyyy hh:MM
-        "travelTime": 65, // podane w minutach,
-        "placesCount": 50, // liczba miejsc w samolocie
-        "placesOccupied": 15 // liczba zajetych miejsc
+        "arrivalDate": "26.06.2022 18:00",
+        "travelTime": 65, 
+        "placesCount": 50, 
+        "placesOccupied": 15
     },
     "returnTransport": {
         "departureAirport": "Paris (CDG)",
@@ -141,4 +146,80 @@
         "placesCount": 50, // liczba miejsc w samolocie
         "placesOccupied": 15 // liczba zajetych miejsc
     } 
+}
+
+// POST reservation
+{
+    tripId: 1,
+    food: "breakfast",
+    room: {
+        "capacity": 4, 
+        "name": "Pokój 2-osobowy", 
+        "features": "klimatyzacja|TV|telefon"
+    }
+}
+
+// UPDATE price of hotel
+UpdateRoomPriceQueue
+UpdateRoomPriceEvent
+{
+    hotelId: 1,
+    room: {
+        "capacity": 4, 
+        "name": "Pokój 2-osobowy",
+        "features": "klimatyzacja|TV|telefon"
+    },
+    newPrice: 240
+}
+
+// UPDATE transport price
+UpdateFlightPriceQueue
+UpdateFlightPriceEvent
+{
+    flightId: 1,
+    price: 490
+}
+
+// ADD TRIP -> TripService
+AddTripQueue
+AddTripEvent
+{
+    hotelId: 1,
+    startFlightId: 1,
+    endFlightId: 1
+}
+
+// REMOVE TRIP -> TripService
+RemoveTripQueue
+RemoveTripEvent
+{
+    tripId: 1
+}
+
+// GET USER RESERVATIONS -> TripService
+GetUserReservations
+{
+    "accommodation": {
+        "hotel": 1000,
+        "room": {
+            "capacity": 4, 
+            "name": "Pokój 4-osobowy", 
+            "features": "klimatyzacja|TV|telefon" 
+        }, 
+        "startDate": 21.06.2000,
+        "endDate": 28.06.2000,
+        "numberOfPeople": 2
+    }
+    "transport": { 
+        "departureAirport": "Warsaw (KOD)",
+        "arrivalAirport": "Paris (CDG)",
+        "departureDateTime": "26.06.2022 16:59",
+        "numberOfPlaces": 2 
+    },
+    "returnTransport": { 
+        "departureAirport": "Paris (CDG)",
+        "arrivalAirport": "Warsaw (KOD)",
+        "departureDateTime": "30.06.2022 16:59",
+        "numberOfPlaces": 2 
+    }
 }

@@ -8,7 +8,8 @@
   "departureDate": "16.08.2023 21:20",
   "arrivalDate": "17.08.2023 06:50",
   "travelTime": 105,
-  "placesCount": 50
+  "placesCount": 50,
+  "price": 490
 }
 ```
 
@@ -32,5 +33,13 @@
 ```json
 {
   "reservationId": 4
+}
+```
+
+**Update flight price**
+```json
+{
+  "flightId": 1,
+  "price": 490
 }
 ```

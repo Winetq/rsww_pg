@@ -1,9 +1,11 @@
-package pl.edu.pg.transport.query;
+package pl.edu.pg.gateway.transport.dto;
 
+import lombok.Builder;
 import lombok.Getter;
 
+@Builder
 @Getter
-public class GetFlightWithParametersQuery {
+public class GetFlightsWithParametersQuery {
     private String departureAirport;
     private String arrivalAirport;
     private String departureDate;

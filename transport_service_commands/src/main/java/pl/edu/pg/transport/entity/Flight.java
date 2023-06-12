@@ -35,9 +35,11 @@ public class Flight {
     @Column(name = "places_occupied")
     private int placesOccupied;
 
+    private int price;
+
     public Flight(String departureAirport, String arrivalAirport,
                   String departureDate, String arrivalDate,
-                  int travelTime, int placesCount) {
+                  int travelTime, int placesCount, int price) {
         this.departureAirport = departureAirport;
         this.arrivalAirport = arrivalAirport;
         this.departureDate = departureDate;
@@ -45,9 +47,14 @@ public class Flight {
         this.travelTime = travelTime;
         this.placesCount = placesCount;
         this.placesOccupied = 0;
+        this.price = price;
     }
 
     public void reservePlaces(int places) {
         this.placesOccupied += places;
+    }
+
+    public void updatePrice(int price) {
+        this.price = price;
     }
 }

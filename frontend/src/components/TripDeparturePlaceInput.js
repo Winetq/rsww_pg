@@ -3,9 +3,10 @@ import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Form from 'react-bootstrap/Form';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTruckPlane } from "@fortawesome/free-solid-svg-icons";
+import { faTruckPlane, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import useFetch from "../hooks/useFetch";
 import UrlBuilder from "./UrlBuilder";
+import InfoToast from "./InfoToast";
 
 
 const departurePlaces = [
@@ -18,13 +19,16 @@ const departurePlaces = [
 export default function TripDeparturePlaceInput({departurePlace, setDeparturePlace}) {
     let urlBuilder = new UrlBuilder();
     let {data, isPending, error} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_DEPARTURE_PLACES_URL'));
-    if(!isPending && data == null)
-        data = departurePlaces;
 
     return (
         <InputGroup>
             <InputGroup.Text>
-                <FontAwesomeIcon icon={faTruckPlane} className="fa-fw" />
+                {
+                isPending ?
+                    <FontAwesomeIcon icon={faCircleNotch} className="fa-fw fa-spin" />
+                :
+                    <FontAwesomeIcon icon={faTruckPlane} className="fa-fw" />
+                }
             </InputGroup.Text>
             <FloatingLabel
                 controlId="departurePlaceInput"
@@ -37,9 +41,10 @@ export default function TripDeparturePlaceInput({departurePlace, setDeparturePla
                     className={isPending ? 'disabled' : ''}
                     required
                 >
+                    <option value="all">Any</option>
                     {
-                    isPending ?
-                        <option value="all" key="all">Any</option>
+                    isPending || error ?
+                        null
                     :
                         data.map((place) => (
                             <option value={place} key={place}>{place}</option>
@@ -47,6 +52,12 @@ export default function TripDeparturePlaceInput({departurePlace, setDeparturePla
                     }
                 </Form.Select>
             </FloatingLabel>
+            {
+            !isPending && error ?
+                <InfoToast variant="danger" content={"Loading departure places has failed :( \"" + error + "\""} />
+            :
+                null
+            }
         </InputGroup>
     )
 }

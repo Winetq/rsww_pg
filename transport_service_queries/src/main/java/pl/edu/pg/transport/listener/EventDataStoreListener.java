@@ -33,7 +33,7 @@ public class EventDataStoreListener {
         logger.info("A new flight was sent to AddFlightNotificationQueue.");
     }
 
-    @RabbitListener(queues = "${spring.rabbitmq.queue.confirmFlightReservationDataStore}")
+    @RabbitListener(queues = "${spring.rabbitmq.queue.updateFlightQueue}")
     public void updateFlight(Message<Flight> message) {
         repository.save(message.getPayload());
     }
