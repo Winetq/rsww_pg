@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 import pl.edu.pg.trip.enity.Transport;
+import pl.edu.pg.trip.listener.events.hotel.HotelDetailsResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class TripsResponse {
     public static class Trip {
         private Integer id;
         private Hotel hotel;
-        private Float tripPrice;
+        private Double tripPrice;
         private String dateStart;
         private String dateEnd;
     }
@@ -46,6 +47,8 @@ public class TripsResponse {
                         .map(trip -> {
                             final var tripBuilder = Trip.builder();
                             final var maybeHotel = hotelAccessor.apply(trip.getHotelId());
+                            double basePrice = 0L;
+
                             if (maybeHotel.isPresent()) {
                                 final var hotel = maybeHotel.get();
                                 tripBuilder.hotel(Hotel.builder().id(hotel.getId())
@@ -54,17 +57,27 @@ public class TripsResponse {
                                                 .place(hotel.getPlace())
                                                 .photo(hotel.getPhoto())
                                         .build());
+                                basePrice = hotel.getRooms().stream()
+                                        .mapToDouble(HotelDetailsResponse.Room::getPrice)
+                                        .min()
+                                        .getAsDouble();
                             }
-
-                            tripBuilder.id(trip.getTripId())
-                                    .tripPrice(priceSupplier.get());
+                            tripBuilder.id(trip.getTripId());
 
                             final var startTransport = transportAccessor.apply(trip.getStartFlightId());
                             final var endTransport = transportAccessor.apply(trip.getEndFlightId());
-                            startTransport.ifPresent(transport -> tripBuilder.dateStart(transport.getDepartureDate()));
-                            endTransport.ifPresent(transport -> tripBuilder.dateEnd(transport.getDepartureDate()));
+                            if (startTransport.isPresent()) {
+                                final var transport = startTransport.get();
+                                tripBuilder.dateStart(transport.getDepartureDate());
+                                basePrice = basePrice + transport.getPrice();
+                            }
+                            if (endTransport.isPresent()) {
+                                final var transport = endTransport.get();
+                                tripBuilder.dateEnd(transport.getDepartureDate());
+                                basePrice = basePrice + transport.getPrice();
+                            }
 
-
+                            tripBuilder.tripPrice(basePrice);
                             return tripBuilder.build();
                         })
                 .toList()).build();

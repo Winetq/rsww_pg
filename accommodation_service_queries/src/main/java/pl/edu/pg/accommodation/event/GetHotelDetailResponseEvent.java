@@ -31,6 +31,7 @@ public class GetHotelDetailResponseEvent implements Event {
         private int capacity;
         private String name;
         private String features;
+        private float price;
     }
 
     public static Function<Hotel, GetHotelDetailResponseEvent> entityToDtoMapper() {
@@ -45,6 +46,7 @@ public class GetHotelDetailResponseEvent implements Event {
                         .capacity(room.getCapacity())
                         .name(room.getName())
                         .features(room.getFeatures())
+                        .price(room.getPrice())
                         .build()).collect(Collectors.toSet()))
                 .airport(entity.getAirport())
                 .food(entity.getFood())

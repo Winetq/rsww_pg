@@ -116,7 +116,7 @@ const TripDetails = () => {
         setIsReserving(true);
 
         let request = new XMLHttpRequest();
-        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+id+'/reserve/', true);
+        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+"/"+id+'/reserve/', true);
         request.addEventListener('load', (event) => {
             if(event.currentTarget.statusCode !== 202){
                 setIsReservationFailed(true);

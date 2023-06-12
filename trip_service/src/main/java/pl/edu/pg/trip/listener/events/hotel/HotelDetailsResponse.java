@@ -31,6 +31,7 @@ public class HotelDetailsResponse {
         private int capacity;
         private String name;
         private String features;
+        private float price;
     }
 
     public static Function<HotelDetailsResponse, Hotel> dtoToEntityMapper() {
