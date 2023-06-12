@@ -13,4 +13,5 @@ public class GetFlightDetailsResponse {
     private int travelTime;
     private int placesCount;
     private int placesOccupied;
+    private int price;
 }

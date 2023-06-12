@@ -8,25 +8,25 @@ import org.springframework.stereotype.Component;
 import pl.edu.pg.transport.dto.GetFlightDetailsResponse;
 import pl.edu.pg.transport.dto.GetFlightsResponse;
 import pl.edu.pg.transport.entity.Flight;
-import pl.edu.pg.transport.query.GetFlightWithParametersQuery;
+import pl.edu.pg.transport.query.GetFlightsWithParametersQuery;
 import pl.edu.pg.transport.repository.FlightRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class GetFlightWithParametersQueryListener {
-    private final static Logger logger = LoggerFactory.getLogger(GetFlightWithParametersQueryListener.class);
+public class GetFlightsWithParametersQueryListener {
+    private final static Logger logger = LoggerFactory.getLogger(GetFlightsWithParametersQueryListener.class);
 
     private final FlightRepository repository;
 
     @Autowired
-    public GetFlightWithParametersQueryListener(FlightRepository repository) {
+    public GetFlightsWithParametersQueryListener(FlightRepository repository) {
         this.repository = repository;
     }
 
-    @RabbitListener(queues = "${spring.rabbitmq.queue.getFlightWithParametersQueue}")
-    public List<GetFlightDetailsResponse> receiveMessage(GetFlightWithParametersQuery message) {
+    @RabbitListener(queues = "${spring.rabbitmq.queue.getFlightsWithParametersQueue}")
+    public List<GetFlightDetailsResponse> receiveMessage(GetFlightsWithParametersQuery message) {
         List<Flight> flights = repository.findAll();
         List<Flight> flightWithParameters = flights
                 .stream()

@@ -18,4 +18,5 @@ public class Flight {
     private int travelTime;
     private int placesCount;
     private int placesOccupied;
+    private int price;
 }
