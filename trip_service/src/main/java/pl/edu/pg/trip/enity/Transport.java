@@ -17,4 +17,5 @@ public class Transport {
     private int travelTime;
     private int placesCount;
     private int placesOccupied;
+    private int price;
 }

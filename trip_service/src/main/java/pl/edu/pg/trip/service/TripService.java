@@ -36,4 +36,12 @@ public class TripService {
     public Optional<Trip> getTrip(Long tripId) {
         return tripRepository.findTrip(tripId);
     }
+
+    public Trip addTrip(Trip trip) {
+        return tripRepository.save(trip);
+    }
+
+    public void removeTrip(Long id) {
+        tripRepository.delete(id);
+    }
 }

@@ -48,3 +48,4 @@ class Initializer:
             return
 
         generate_trips(self.to.channel, self.to.add_trip_queue, hotels, flights)
+        print("Finished generating trips")

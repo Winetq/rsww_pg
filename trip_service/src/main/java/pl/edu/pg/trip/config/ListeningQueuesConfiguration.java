@@ -79,4 +79,14 @@ public class ListeningQueuesConfiguration {
     public Queue getTripDetailsQueue(@Value("${spring.rabbitmq.queue.trip.get.details}") final String queueName) {
         return new Queue(queueName, true);
     }
+
+    @Bean
+    public Queue addTripQueue(@Value("${spring.rabbitmq.queue.trip.add}") final String addTripQueueName) {
+        return new Queue(addTripQueueName, true);
+    }
+
+    @Bean
+    public Queue removeTripQueue(@Value("${spring.rabbitmq.queue.trip.remove}") final String removeTripQueueName) {
+        return new Queue(removeTripQueueName, true);
+    }
 }

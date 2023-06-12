@@ -23,6 +23,7 @@ public class GetFlightDetailsResponse {
     private int travelTime;
     private int placesCount;
     private int placesOccupied;
+    private int price;
 
     public static Function<GetFlightDetailsResponse, Transport> toEntityMapper() {
         return response -> Transport.builder()
@@ -33,6 +34,7 @@ public class GetFlightDetailsResponse {
                 .travelTime(response.travelTime)
                 .placesCount(response.placesCount)
                 .placesOccupied(response.placesOccupied)
+                .price(response.price)
                 .build();
     }
 }

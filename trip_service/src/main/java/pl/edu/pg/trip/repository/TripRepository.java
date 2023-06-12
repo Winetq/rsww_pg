@@ -12,6 +12,7 @@ import pl.edu.pg.trip.storage.MongoDatabaseWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public class TripRepository {
@@ -45,6 +46,11 @@ public class TripRepository {
     }
 
     public Trip save(Trip trip) {
+        if (trip.getTripId() == null) {
+            final var uuid = UUID.randomUUID();
+            trip.setTripId(uuid.getMostSignificantBits() & Long.MAX_VALUE);
+            trip.setTripId(uuid.getMostSignificantBits() & Long.MAX_VALUE);
+        }
         try {
             mongoDatabaseWrapper.getDatabase()
                     .getCollection(TRIPS_COLLECTION, Trip.class)
@@ -53,5 +59,13 @@ public class TripRepository {
             log.error("Exception during writing to the database.", ex);
         }
         return trip;
+    }
+
+    public void delete(Long id) {
+        final var query = new BasicDBObject();
+        query.put("tripId", id);
+        mongoDatabaseWrapper.getDatabase()
+                .getCollection(TRIPS_COLLECTION, Trip.class)
+                .deleteOne(query);
     }
 }
