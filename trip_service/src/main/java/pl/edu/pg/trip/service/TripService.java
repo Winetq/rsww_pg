@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +21,8 @@ public class TripService {
     private final TripRepository tripRepository;
     private final DelegatingTransportService transportService;
     private final DelegatingHotelService hotelService;
+    private AtomicLong idAccessor;
+
     @Autowired
     public TripService(final TripRepository tripRepository,
                        final DelegatingHotelService delegatingHotelService,

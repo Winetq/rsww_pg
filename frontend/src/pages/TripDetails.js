@@ -103,8 +103,8 @@ const TripDetails = () => {
     const toggleIsReservationFailed = () => setIsReservationFailed(!isReservationFailed);
 
     const urlBuilder = new UrlBuilder();
-    let {data, isPending, error} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+id);
-    // data = trip;
+    let {data, isPending, error} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL') + "/" + id);
+//    data = trip;
     
     let handleClickReserveTrip = async (event) => {
         event.preventDefault();
@@ -210,11 +210,11 @@ const TripDetails = () => {
                     </div>
                     <div className="d-flex justify-content-start mb-2">
                         <FontAwesomeIcon icon={faLocationDot} className="fa-fw me-1 bg-info p-2 rounded text-white" />
-                        <div className="my-auto">{trip.hotel.country} | {trip.hotel.city}</div>
+                        <div className="my-auto">{data.hotel.country} | {data.hotel.city}</div>
                     </div>
                     <div className="d-flex justify-content-start mb-2">
                         <FontAwesomeIcon icon={faHotel} className="fa-fw me-1 bg-warning p-2 rounded text-white" />
-                        <div className="my-auto">{trip.hotel.name}</div>
+                        <div className="my-auto">{data.hotel.name}</div>
                     </div>
                     <div className="d-flex justify-content-start mb-2">
                         <FontAwesomeIcon icon={faBed} className="fa-fw me-1 bg-success p-2 rounded text-white" />
@@ -236,34 +236,34 @@ const TripDetails = () => {
         <div className="row mb-3 px-3 py-4 gx-4 rounded shadow">
             <div className="mb-2 pb-2 text-warning border-bottom d-flex justify-content-start w-100 align-items-center fw-bold">
                 <FontAwesomeIcon icon={faHotel} className="fa-fw me-2 bg-warning p-2 rounded text-white" />
-                <div className="me-2">{trip.hotel.name}</div>
-                <div className="me-2">{trip.hotel.stars}<FontAwesomeIcon icon={faStar} className="fa-fw"/></div>
+                <div className="me-2">{data.hotel.name}</div>
+                <div className="me-2">{data.hotel.stars}<FontAwesomeIcon icon={faStar} className="fa-fw"/></div>
             </div>
             <div className="mb-2 pb-2 text-info border-bottom d-flex justify-content-start w-100 align-items-center fw-bold">
                 <FontAwesomeIcon icon={faLocationDot} className="fa-fw me-2 bg-info p-2 rounded text-white" />
-                <div className="me-2">{trip.hotel.country} | {trip.hotel.city}</div>
+                <div className="me-2">{data.hotel.country} | {data.hotel.city}</div>
             </div>
             <div className="mb-2 pb-2 text-success border-bottom d-flex justify-content-start w-100 align-items-top">
                 <FontAwesomeIcon icon={faTruckPlane} className="fa-fw me-2 bg-success p-2 rounded text-white my-auto" />
                 <div className="me-2">
                     <div><FontAwesomeIcon icon={faPlaneDeparture} className="fa-fw me-1"/> Departure</div>
-                    <div>{trip.transport.departureAirport}</div>
-                    <div>{trip.transport.departureDateTime}</div>
+                    <div>{data.transport.departureAirport}</div>
+                    <div>{data.transport.departureDateTime}</div>
                 </div>
                 <div className="mx-3 my-auto">
                     <FontAwesomeIcon icon={faRightLong} />
                 </div>
                 <div className="mx-2 text-center">
                     <div><FontAwesomeIcon icon={faClock} className="fa-fw me-1"/>Travel time</div>
-                    <div>{trip.transport.travelTime} min</div>
+                    <div>{data.transport.travelTime} min</div>
                 </div>
                 <div className="mx-3 my-auto">
                     <FontAwesomeIcon icon={faRightLong} />
                 </div>
                 <div className="mx-2">
                     <div><FontAwesomeIcon icon={faPlaneArrival} className="fa-fw me-1"/>Arrival</div>
-                    <div>{trip.transport.arrivalAirport}</div>
-                    <div>{trip.transport.arrivalDate}</div>
+                    <div>{data.transport.arrivalAirport}</div>
+                    <div>{data.transport.arrivalDate}</div>
                 </div>
             </div>
             <div className="border-bottom pb-2 mb-2">
@@ -271,7 +271,7 @@ const TripDetails = () => {
                     <FontAwesomeIcon icon={faCircleInfo} className="fa-fw me-2 bg-success p-2 rounded text-white" />
                     <div className="my-auto text-success">Hotel Details</div>
                 </div>
-                <div>{trip.hotel.description}</div>
+                <div>{data.hotel.description}</div>
             </div>
         </div>
         <div className="row mb-3 px-3 py-4 gx-4 rounded shadow">
@@ -281,7 +281,7 @@ const TripDetails = () => {
                     <div className="my-auto">Food</div>
                 </div>
                 <div className="d-flex justify-items-start">
-                    {trip.hotel.food.split("|").map((food) => (
+                    {data.hotel.food.split("|").map((food) => (
                         <TripFoodElement food={food} key={food} setFood={setFood} />
                     ))}
                 </div>
@@ -292,7 +292,7 @@ const TripDetails = () => {
                     <div className="my-auto">Rooms</div>
                 </div>
                 <div className="row row-cols-1 row-cols-lg-4 gx-3 gy-2">
-                    {trip.hotel.rooms.map((room) => (
+                    {data.hotel.rooms.map((room) => (
                         <TripRoomsElement room={room} setRoom={setRoom} key={room.key}/>
                     ))}
                 </div>

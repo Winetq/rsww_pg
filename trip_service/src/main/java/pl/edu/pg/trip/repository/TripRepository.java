@@ -2,6 +2,7 @@ package pl.edu.pg.trip.repository;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoWriteException;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +27,7 @@ public class TripRepository {
     }
 
     public Optional<Trip> findTrip(final Long tripId) {
-        final var query = new BasicDBObject();
-        query.put("tripId", tripId);
+        final var query = new Document("tripId", tripId);
         return Optional.ofNullable(mongoDatabaseWrapper
                 .getDatabase()
                 .getCollection(TRIPS_COLLECTION, Trip.class)
@@ -47,9 +47,8 @@ public class TripRepository {
 
     public Trip save(Trip trip) {
         if (trip.getTripId() == null) {
-            final var uuid = UUID.randomUUID();
-            trip.setTripId(uuid.getMostSignificantBits() & Long.MAX_VALUE);
-            trip.setTripId(uuid.getMostSignificantBits() & Long.MAX_VALUE);
+            final var uuid = UUID.randomUUID().hashCode();
+            trip.setTripId(uuid);
         }
         try {
             mongoDatabaseWrapper.getDatabase()

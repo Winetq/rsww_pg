@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Trip {
-    private Long tripId;
+    private Integer tripId;
     private Long hotelId;
     private Long startFlightId;
     private Long endFlightId;

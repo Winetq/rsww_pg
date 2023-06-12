@@ -3,11 +3,8 @@ package pl.edu.pg.trip.listener.events.trip;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
-import pl.edu.pg.trip.enity.Hotel;
 import pl.edu.pg.trip.enity.Transport;
-import pl.edu.pg.trip.enity.Trip;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -24,7 +21,7 @@ public class TripsResponse {
     @Builder
     @Jacksonized
     public static class Trip {
-        private Long id;
+        private Integer id;
         private Hotel hotel;
         private Float tripPrice;
         private String dateStart;
