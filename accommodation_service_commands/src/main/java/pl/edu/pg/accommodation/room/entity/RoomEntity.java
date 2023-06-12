@@ -35,9 +35,9 @@ public class RoomEntity {
     private int capacity;
 
     private float price;
-
+    @Column(columnDefinition="text")
     private String name;
-
+    @Column(columnDefinition="text")
     private String features;
 
     @ManyToOne

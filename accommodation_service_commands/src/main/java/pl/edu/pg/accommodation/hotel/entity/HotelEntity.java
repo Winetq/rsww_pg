@@ -29,13 +29,20 @@ public class HotelEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
+    @Column(columnDefinition="text")
     private String name;
+    @Column(columnDefinition="text")
     private String country;
+    @Column(columnDefinition="text")
     private String city;
     private int stars;
+    @Column(columnDefinition="text")
     private String description;
+    @Column(columnDefinition="text")
     private String photo;
+    @Column(columnDefinition="text")
     private String airport;
+    @Column(columnDefinition="text")
     private String food;
 
     @Override
