@@ -49,7 +49,7 @@ const MyReservationsListElement = ({reservation}) => {
         setIsPaying(true);
 
         let request = new XMLHttpRequest();
-        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+reservation.tripId+'/payment/', true);
+        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+"/"+reservation.tripId+'/payment/', true);
         request.addEventListener('load', (event) => {
             setIsPaying(false);
             if(event.currentTarget.statusCode !== 200)
@@ -98,9 +98,13 @@ const MyReservationsListElement = ({reservation}) => {
                                     Processing....
                                 </Button>
                             :
-                                <Button variant="outline-success" className="w-100" onClick={handlePayForReservationClick}>
+                                <Button 
+                                    variant="outline-success" 
+                                    className={"w-100 " + isPaymentSucceeded ? "disabled " : null} 
+                                    onClick={handlePayForReservationClick}
+                                >
                                     <FontAwesomeIcon icon={faCreditCard} className="fa-fw me-1" />
-                                    Pay for trip
+                                    {isPaymentSucceeded ? "Paid" : "Pay for trip" }
                                 </Button>
                             }
                         </div>

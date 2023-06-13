@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -10,10 +10,9 @@ import TripDateInput from "../components/TripDateInput";
 import TripDeparturePlaceInput from "../components/TripDeparturePlaceInput";
 import TripPeopleCollapse from "../components/TripPeopleCollapse";
 import TripsListElementSkeleton from "../components/TripsListElementSkeleton";
-import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
 import InfoToast from "../components/InfoToast";
-import LatestTOChangesTable from "../components/LatestTOChangesTable";
+import LatestTOUpdatesTable from "../components/LatestTOUpdatesTable";
 
 
 const trips = {
@@ -64,8 +63,6 @@ const Home = () => {
     const navigate = useNavigate();
     const urlBuilder = new UrlBuilder();
 
-    let {data: latestTOChanges, isPending: isLatestTOChangesPending, error: latestTOChangesError} = useFetch(urlBuilder.build('REACT_APP_API_ROOT_URL')+'to-updates');
-
     let zeroPader = (number) => {
         if(number < 10)
             return "0"+number;
@@ -89,6 +86,24 @@ const Home = () => {
         if(people3To9 + people10To17 + peopleOver18 + (newValue-actVal) <= maxParticipants)
             setFunction(newValue);
     }
+
+    let [TOUpdates, setTOUpdates] = useState(null);
+    const updatesDelay = 2*1000;
+    useEffect(() => {
+        const updateInterval = setInterval(async () => {
+            setTOUpdates([]);
+
+            const update = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TO_LATEST_UPDATES'));
+            try{
+                let updatesResponse = await update.json();
+                setTOUpdates(updatesResponse.responseText);
+            } catch {
+                return;
+            }
+        }, updatesDelay);
+        
+        return () => clearInterval(updateInterval);
+    }, []);
 
     return (
         <div className="home">
@@ -145,12 +160,12 @@ const Home = () => {
                 10 latest changes of Tour Operator
             </div>
             <div className="mt-2">
-                {isLatestTOChangesPending ?
-                    <TripsListElementSkeleton />
-                : latestTOChangesError ?
-                    <InfoToast variant="danger" content={"Loading TO latest changes failed. Handled error: \"" + latestTOChangesError + "\""} />
+                {TOUpdates ?
+                    <LatestTOUpdatesTable updates={TOUpdates} />
+                : TOUpdates == null ?
+                    <InfoToast variant="danger" content="Getting TO latest updates failed :(" />
                 :
-                    <LatestTOChangesTable changes={latestTOChanges} />
+                    <TripsListElementSkeleton />
                 }
             </div>
         </div>
