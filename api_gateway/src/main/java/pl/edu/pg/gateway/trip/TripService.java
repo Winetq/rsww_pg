@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import pl.edu.pg.gateway.trip.dto.GetDeparturesRequest;
+import pl.edu.pg.gateway.trip.dto.GetDeparturesResponse;
+import pl.edu.pg.gateway.trip.dto.GetDestinationRequest;
+import pl.edu.pg.gateway.trip.dto.GetDestinationsResponse;
 import pl.edu.pg.gateway.trip.dto.TripDetailsRequest;
 import pl.edu.pg.gateway.trip.dto.TripDetailsResponse;
 import pl.edu.pg.gateway.trip.dto.TripsRequest;
@@ -26,14 +30,20 @@ public class TripService {
     private final RabbitTemplate rabbitTemplate;
     private final String getTripsQueueName;
     private final String getTripDetailsQueueName;
+    private final String getDestinationsQueueName;
+    private final String getDeparturesQueueName;
 
     @Autowired
     TripService(final RabbitTemplate rabbitTemplate,
                 @Value("${spring.rabbitmq.queue.trip.get.all}") final String getTripsQueueName,
-                @Value("${spring.rabbitmq.queue.trip.get.details}") final String getTripDetailsQueueName) {
+                @Value("${spring.rabbitmq.queue.trip.get.details}") final String getTripDetailsQueueName,
+                @Value("${spring.rabbitmq.queue.hotel.destinations}") final String getDestinationsQueueName,
+                @Value("${spring.rabbitmq.queue.hotels.departures}") final String getDeparturesQueueName) {
         this.rabbitTemplate = rabbitTemplate;
         this.getTripsQueueName = getTripsQueueName;
         this.getTripDetailsQueueName = getTripDetailsQueueName;
+        this.getDestinationsQueueName = getDestinationsQueueName;
+        this.getDeparturesQueueName = getDeparturesQueueName;
     }
 
     public Optional<TripsResponse> getTrips(final SearchParams searchParams) {
@@ -59,11 +69,25 @@ public class TripService {
     }
 
     public List<String> getDestinations() {
-        return ImmutableList.of("Egipt", "Turcja", "Włochy", "Hiszpania");
+        final var request = GetDestinationRequest.builder().build();
+        final GetDestinationsResponse response = rabbitTemplate.convertSendAndReceiveAsType(
+                getDestinationsQueueName,
+                request,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        return response.getDestinations();
     }
 
     public List<String> getPossibleDepartures() {
-        return ImmutableList.of("Dojazd własny", "Warszawa (WAW)", "Gdańsk (GDA)", "Kraków (KRA)");
+        final var request = GetDeparturesRequest.builder().build();
+        final GetDeparturesResponse response = rabbitTemplate.convertSendAndReceiveAsType(
+                getDeparturesQueueName,
+                request,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        return response.getDepartures();
     }
 
     @Data
