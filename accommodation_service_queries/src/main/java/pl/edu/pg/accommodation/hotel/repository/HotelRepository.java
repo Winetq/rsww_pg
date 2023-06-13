@@ -14,9 +14,11 @@ import pl.edu.pg.accommodation.model.Room;
 import pl.edu.pg.accommodation.storage.MongoDatabaseWrapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 @Repository
 public class HotelRepository {
@@ -55,7 +57,6 @@ public class HotelRepository {
             );
         }, () -> {
             log.error("No hotel with id: {}. Cannot add room to not existing hotel.", hotelId);
-//            throw new NoSuchElementException("No hotel found.");
         });
         return room;
     }
@@ -68,5 +69,11 @@ public class HotelRepository {
         BasicDBObject query = new BasicDBObject();
         query.put("_id", id);
         return Optional.ofNullable(hotelsCollection().find(query).first());
+    }
+
+    public Set<String> getDestinations() {
+        final var allHotels = new HashSet<String>();
+        mongoDb.getDatabase().getCollection(HOTEL_COLLECTION, Hotel.class).distinct("country", String.class).into(allHotels);
+        return allHotels;
     }
 }

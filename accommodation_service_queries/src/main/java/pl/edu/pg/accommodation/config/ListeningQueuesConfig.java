@@ -43,4 +43,9 @@ public class ListeningQueuesConfig {
     Queue autoDeleteQueue() {
         return new AnonymousQueue();
     }
+
+    @Bean
+    public Queue destinationsQueue(@Value("${spring.rabbitmq.queue.hotel.destinations}") String queueName) {
+        return new Queue(queueName, true);
+    }
 }

@@ -1,16 +1,23 @@
 package pl.edu.pg.accommodation.hotel.listener;
 
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pl.edu.pg.accommodation.event.GetDestinationsRequest;
+import pl.edu.pg.accommodation.event.GetDestinationsResponse;
 import pl.edu.pg.accommodation.event.GetHotelDetailResponseEvent;
 import pl.edu.pg.accommodation.event.GetHotelDetailsEvent;
 import pl.edu.pg.accommodation.event.GetHotelsEvent;
 import pl.edu.pg.accommodation.event.GetHotelsResponseEvent;
 import pl.edu.pg.accommodation.hotel.service.HotelService;
+import pl.edu.pg.accommodation.model.Hotel;
+
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Component
 public class HotelListener {
@@ -25,7 +32,10 @@ public class HotelListener {
     public GetHotelsResponseEvent getHotelsListener(GetHotelsEvent request, Message message) {
         log.debug("Received request for all hotels. Message correlation id: {}",
                 message.getMessageProperties().getCorrelationId());
-        final var hotels = hotelService.getAllHotels();
+        final var hotelsPredicate = hotelPredicate(request);
+        final var hotels = hotelService.getAllHotels().stream()
+                .filter(hotelsPredicate)
+                .collect(Collectors.toList());
         return GetHotelsResponseEvent.entityToDtoMapper().apply(hotels);
     }
 
@@ -42,5 +52,23 @@ public class HotelListener {
                     .build();
         }
         return GetHotelDetailResponseEvent.entityToDtoMapper().apply(maybeHotel.get());
+    }
+
+    private Predicate<Hotel> hotelPredicate(GetHotelsEvent request) {
+        final Predicate<Hotel> destinationPredicate = hotel -> {
+            if (Strings.isEmpty(request.getDestination())) {
+                return true;
+            }
+            if (request.getDestination().equals("all")) {
+                return true;
+            }
+            return request.getDestination().equals(hotel.getCountry());
+        };
+        return destinationPredicate;
+    }
+
+    @RabbitListener(queues = "${spring.rabbitmq.queue.hotel.destinations}")
+    public GetDestinationsResponse getDestinations(GetDestinationsRequest request, Message message) {
+        return GetDestinationsResponse.builder().destinations(hotelService.getDestinations().stream().toList()).build();
     }
 }

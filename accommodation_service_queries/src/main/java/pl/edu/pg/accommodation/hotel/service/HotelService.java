@@ -33,4 +33,8 @@ public class HotelService {
     public Room addRoomInHotel(final long hotelId, final Room room) {
         return hotelRepository.addRoomInHotel(hotelId, room);
     }
+
+    public Set<String> getDestinations() {
+        return hotelRepository.getDestinations();
+    }
 }
