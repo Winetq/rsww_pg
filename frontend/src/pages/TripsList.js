@@ -4,7 +4,6 @@ import TripsListElement from "../components/TripsListElement";
 import TripsListElementSkeleton from "../components/TripsListElementSkeleton";
 import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
-import { useParams } from "react-router-dom";
 import InfoToast from "../components/InfoToast";
 import NotificationToast from "../components/NotificationToast";
 
@@ -54,19 +53,19 @@ const TripsList = () => {
     let {data, isPending, error} = useFetch(url.href);
     // data = exampleTrips.trips;
     
-    let [notification, setNotification] = useState(() => null);
+    let [notifications, setNotifications] = useState(() => null);
     const notifyDelay = 2*1000;
 
     useEffect(() => {
         const notifyInterval = setInterval(async () => {
-            setNotification(null);
+            setNotifications([]);
 
-            const notify = await fetch("/api/trip-update?"+urlParams.toString());
             try{
+                const notify = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_DESTINATION_NOTIFICATIONS')+'?destination='+urlParams.get('destination'));
                 let notifyResponse = await notify.json();
-                setNotification(notifyResponse.responseText);
+                setNotifications(notifyResponse.responseText);
             } catch {
-                setNotification('Could not parse notification :(');
+                setNotifications([{notification: 'Could not parse notification :('}]);
                 return;
             }
         }, notifyDelay);
@@ -95,7 +94,13 @@ const TripsList = () => {
                 ))
             }
 
-            {notification ? <NotificationToast variant="warning" content={notification} /> : null}
+            { notifications ? 
+                notifications.map((notification) => (
+                    <NotificationToast variant="warning" content={notification.notification} />
+                )) 
+            : 
+            null
+            }
         </div>
     )
     

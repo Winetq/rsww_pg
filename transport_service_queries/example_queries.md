@@ -14,7 +14,7 @@
 }
 ```
 
-**Get flight with parameters**
+**Get flights with parameters**
 ```json
 {
   "departureAirport": "Warsaw (KOD)",
