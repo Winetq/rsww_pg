@@ -8,10 +8,8 @@ from flights.GetFlightsEvent import GetFlightsEvent
 from flights.UpdateFlightPriceEvent import UpdateFlightPriceEvent
 from hotels.GetHotelDetailsEvent import GetHotelDetailsEvent
 from hotels.GetHotelsEvent import GetHotelsEvent
-from hotels.Hotel import Hotel
 from hotels.HotelDetails import HotelDetails
 from hotels.UpdateRoomPriceEvent import UpdateRoomPriceEvent
-from initializer import Initializer
 from functions import generate_trips_for_hotel, generate_trips_for_flight
 from trips.DeleteTripEvent import DeleteTripEvent
 from trips.GetTripsEvent import GetTripsEvent
@@ -163,7 +161,7 @@ class TourOperator:
 
 if __name__ == "__main__":
     tour_operator = TourOperator()
-    Initializer(tour_operator, 5)
+    # Initializer(tour_operator, 5)
     # print("Start of generating changes by TO")
     # tour_operator.generate()
     # tour_operator.close_connection()

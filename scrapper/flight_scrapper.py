@@ -98,10 +98,6 @@ class FlightScrapper:
 
         if dep1[1].text.strip() not in polishAirports:
             polishAirports += [dep1[1].text.strip()]
-        if arr1[1].text.strip() not in polishAirports:
-            polishAirports += [arr1[1].text.strip()]
-        if dep2[1].text.strip() not in polishAirports:
-            polishAirports += [dep2[1].text.strip()]
         if arr2[1].text.strip() not in polishAirports:
             polishAirports += [arr2[1].text.strip()]
 
