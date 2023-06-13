@@ -77,4 +77,10 @@ public class RabbitMqConfig {
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
+
+
+    @Bean
+    public Queue departuresQueue(@Value("${spring.rabbitmq.queue.flights.departures}") String queueName) {
+        return new Queue(queueName, true);
+    }
 }
