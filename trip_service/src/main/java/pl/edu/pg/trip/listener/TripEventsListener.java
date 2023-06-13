@@ -50,7 +50,7 @@ public class TripEventsListener {
         log.debug("Request: {}", request);
 
         final var trips = tripService.getTrips(request).stream().collect(Collectors.toList());
-        final var dtoTrips = trips.parallelStream().map(trip -> TripsResponse.toDtoMapper(
+        final var dtoTrips = trips.parallelStream().limit(200).map(trip -> TripsResponse.toDtoMapper(
                 transportService::getTransport,
                 hotelService::getHotel)
                 .apply(trip))

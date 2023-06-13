@@ -67,7 +67,13 @@ public class HotelListener {
             return request.getDestination().equals(hotel.getCountry());
         };
         final Predicate<Hotel> capacityCondition = hotel -> {
-            final var requiredCapacity = request.getAdults() + request.getPeople3To9() + request.getPeople10To17();
+            if (request.getAdults() == null && request.getPeople3To9() == null && request.getPeople10To17() == null) {
+                return true;
+            }
+            int requiredCapacity = 0;
+            requiredCapacity += request.getAdults() == null ? 0 : request.getAdults();
+            requiredCapacity += request.getPeople3To9() == null ? 0 : request.getPeople3To9();
+            requiredCapacity += request.getPeople10To17() == null ? 0 : request.getPeople10To17();
             final var hotelCapacity = hotel.getRooms().stream().map(Room::getCapacity).reduce(0, (a, b) -> a+b);
             return hotelCapacity >= requiredCapacity;
         };

@@ -37,7 +37,10 @@ public class TripService {
     }
 
     public List<Trip> getTrips(TripsRequest request) {
-        final var requiredPlaces = request.getPeople10To17() + request.getPeople3To9() + request.getAdults();
+        int requiredPlaces = request.getPeople10To17() == null ? 0 : request.getPeople10To17();
+        requiredPlaces += request.getPeople3To9() == null ? 0 : request.getPeople3To9();
+        requiredPlaces += request.getAdults() == null ? 0 : request.getAdults();
+        final var minPlaces = requiredPlaces;
         final var trips = tripRepository.findAllTrips();
         final var hotels = hotelService.getHotels(DelegatingHotelService.SearchParams.builder()
                 .adults(request.getAdults())
@@ -53,7 +56,7 @@ public class TripService {
                 request.getStartDate(),
                 "")
                 .stream()
-                .filter(transport -> transport.getPlacesCount() - transport.getPlacesOccupied() >= requiredPlaces)
+                .filter(transport -> transport.getPlacesCount() - transport.getPlacesOccupied() >= minPlaces)
                 .map(Transport::getId)
                 .collect(Collectors.toSet());
 

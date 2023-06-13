@@ -21,6 +21,7 @@ public class GetHotelDetailResponseEvent {
     private String food;
     private String name;
 
+
     @Data
     @Builder
     @Jacksonized
@@ -28,5 +29,7 @@ public class GetHotelDetailResponseEvent {
         private int capacity;
         private String name;
         private String features;
+        private float price;
+
     }
 }
