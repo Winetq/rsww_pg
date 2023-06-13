@@ -14,7 +14,7 @@ import pl.edu.pg.trip.service.DelegatingHotelService;
 import pl.edu.pg.trip.service.DelegatingTransportService;
 import pl.edu.pg.trip.service.TripService;
 
-import java.util.Random;
+import java.util.stream.Collectors;
 
 @Component
 public class TripEventsListener {
@@ -48,14 +48,14 @@ public class TripEventsListener {
     @RabbitListener(queues = "${spring.rabbitmq.queue.trip.get.all}")
     public TripsResponse getTrips(TripsRequest request, Message message) {
         log.debug("Request: {}", request);
-        final Random random = new Random();
-        final var trips = tripService.getTrips();
-        final var response = TripsResponse.toDtoMapper(
-                transportService::getTransport,
-                hotelService::getHotel,
-                () -> random.nextFloat(1000, 5000)
-        ).apply(trips);
 
+        final var trips = tripService.getTrips(request).stream().collect(Collectors.toList());
+        final var dtoTrips = trips.parallelStream().map(trip -> TripsResponse.toDtoMapper(
+                transportService::getTransport,
+                hotelService::getHotel)
+                .apply(trip))
+                .collect(Collectors.toList());
+        final var response = TripsResponse.builder().trips(dtoTrips).build();
         log.debug("Response: {}", response);
         return response;
     }

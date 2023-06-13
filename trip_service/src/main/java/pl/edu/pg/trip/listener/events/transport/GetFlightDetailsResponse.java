@@ -27,6 +27,7 @@ public class GetFlightDetailsResponse {
 
     public static Function<GetFlightDetailsResponse, Transport> toEntityMapper() {
         return response -> Transport.builder()
+                .id(response.getId())
                 .departureAirport(response.departureAirport)
                 .arrivalAirport(response.arrivalAirport)
                 .arrivalDate(response.arrivalDate)

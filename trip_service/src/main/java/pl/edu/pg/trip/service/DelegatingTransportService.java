@@ -11,23 +11,29 @@ import org.springframework.stereotype.Component;
 import pl.edu.pg.trip.enity.Transport;
 import pl.edu.pg.trip.listener.events.transport.GetFlightDetailsQuery;
 import pl.edu.pg.trip.listener.events.transport.GetFlightDetailsResponse;
+import pl.edu.pg.trip.listener.events.transport.GetFlightsQueryRequest;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Component
 public class DelegatingTransportService {
     private final Logger logger = LoggerFactory.getLogger(DelegatingTransportService.class);
     private final String flightDetailsQueue;
+    private final String flightsWithQueryQueue;
     private final AsyncRabbitTemplate template;
 
     @Autowired
     public DelegatingTransportService(final AsyncRabbitTemplate asyncRabbitTemplate,
-                                      @Value("${spring.rabbitmq.queue.getFlightDetailsQueue}") final String flightDetailsQueue) {
+                                      @Value("${spring.rabbitmq.queue.getFlightDetailsQueue}") final String flightDetailsQueue,
+                                      @Value("${spring.rabbitmq.queue.getFlightsWithParametersQueue}") final String flightsWithQueryQueue) {
         this.template = asyncRabbitTemplate;
         this.flightDetailsQueue = flightDetailsQueue;
+        this.flightsWithQueryQueue = flightsWithQueryQueue;
     }
 
     public List<Transport> getTransports() {
@@ -51,4 +57,48 @@ public class DelegatingTransportService {
         }
         return Optional.ofNullable(transport);
     }
+
+    public List<Transport> getTransports(final String departureAirport,
+                                         final String arrivalAirport,
+                                         final String departureDate,
+                                         final String arrivalDate) {
+        GetFlightsQueryRequest query = GetFlightsQueryRequest.builder()
+                .departureAirport(departureAirport)
+                .arrivalAirport(arrivalAirport)
+                .departureDate(departureDate)
+                .arrivalDate(arrivalDate)
+                .build();
+
+        CompletableFuture<List<GetFlightDetailsResponse>> completableRequest = template.convertSendAndReceiveAsType(
+                flightsWithQueryQueue,
+                query,
+                new ParameterizedTypeReference<>() {
+                });
+        try {
+            return completableRequest.get().stream().map(dto -> Transport.builder()
+                            .departureAirport(dto.getDepartureAirport())
+                            .arrivalAirport(dto.getArrivalAirport())
+                            .arrivalDate(dto.getArrivalDate())
+                            .departureDate(dto.getDepartureDate())
+                            .travelTime(dto.getTravelTime())
+                            .placesCount(dto.getPlacesCount())
+                            .placesOccupied(dto.getPlacesOccupied())
+                            .price(dto.getPrice())
+                            .id(dto.getId())
+                            .build())
+                    .collect(Collectors.toList());
+        }  catch (ExecutionException | InterruptedException e) {
+            logger.error("Error when fetching transports with query parameters departureAirport={};" +
+                    " arrivalAirport={}; departureDate={}; arrivalDate={}",
+                    departureAirport,
+                    arrivalAirport,
+                    departureAirport,
+                    arrivalAirport,
+                    e
+            );
+        }
+        return ImmutableList.of();
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package pl.edu.pg.transport.listener;
 
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -30,10 +31,10 @@ public class GetFlightsWithParametersQueryListener {
         List<Flight> flights = repository.findAll();
         List<Flight> flightWithParameters = flights
                 .stream()
-                .filter(flight -> flight.getDepartureAirport().equals(message.getDepartureAirport()))
-                .filter(flight -> flight.getArrivalAirport().equals(message.getArrivalAirport()))
-                .filter(flight -> flight.getDepartureDate().startsWith(message.getDepartureDate()))
-                .filter(flight -> flight.getArrivalDate().startsWith(message.getArrivalDate()))
+                .filter(flight -> Strings.isEmpty(message.getDepartureAirport()) || flight.getDepartureAirport().equals(message.getDepartureAirport()) || message.getDepartureAirport().equals("all"))
+                .filter(flight -> Strings.isEmpty(message.getArrivalAirport()) || flight.getArrivalAirport().equals(message.getArrivalAirport()) || message.getArrivalAirport().equals("all"))
+                .filter(flight -> Strings.isEmpty(message.getDepartureDate()) || flight.getDepartureDate().startsWith(message.getDepartureDate()))
+                .filter(flight -> Strings.isEmpty(message.getArrivalDate()) || flight.getArrivalDate().startsWith(message.getArrivalDate()))
                 .collect(Collectors.toList());
         logger.info("Flights with these parameters were sent.");
         return GetFlightsResponse.entityToDtoMapper().apply(flightWithParameters);

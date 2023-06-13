@@ -15,6 +15,7 @@ import pl.edu.pg.accommodation.event.GetHotelsEvent;
 import pl.edu.pg.accommodation.event.GetHotelsResponseEvent;
 import pl.edu.pg.accommodation.hotel.service.HotelService;
 import pl.edu.pg.accommodation.model.Hotel;
+import pl.edu.pg.accommodation.model.Room;
 
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class HotelListener {
         log.debug("Received request for all hotels. Message correlation id: {}",
                 message.getMessageProperties().getCorrelationId());
         final var hotelsPredicate = hotelPredicate(request);
+
         final var hotels = hotelService.getAllHotels().stream()
                 .filter(hotelsPredicate)
                 .collect(Collectors.toList());
@@ -64,7 +66,13 @@ public class HotelListener {
             }
             return request.getDestination().equals(hotel.getCountry());
         };
-        return destinationPredicate;
+        final Predicate<Hotel> capacityCondition = hotel -> {
+            final var requiredCapacity = request.getAdults() + request.getPeople3To9() + request.getPeople10To17();
+            final var hotelCapacity = hotel.getRooms().stream().map(Room::getCapacity).reduce(0, (a, b) -> a+b);
+            return hotelCapacity >= requiredCapacity;
+        };
+        return destinationPredicate
+                .and(capacityCondition);
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.queue.hotel.destinations}")

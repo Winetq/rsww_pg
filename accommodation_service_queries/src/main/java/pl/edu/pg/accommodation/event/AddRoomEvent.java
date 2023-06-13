@@ -23,6 +23,7 @@ public class AddRoomEvent {
                 .name(event.getName())
                 .features(event.getFeatures())
                 .price(event.getBasePrice())
+                .capacity(event.getCapacity())
                 .build();
     }
 }

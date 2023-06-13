@@ -1,6 +1,8 @@
 package pl.edu.pg.trip.service;
 
 import com.google.common.collect.ImmutableList;
+import lombok.Builder;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 @Component
 public class DelegatingHotelService {
@@ -35,8 +38,8 @@ public class DelegatingHotelService {
         this.getHotelDetailsQueueName = getHotelDetailsQueueName;
     }
 
-    public List<Hotel> getHotels() {
-        final var request = new GetHotelsRequest();
+    public List<Hotel> getHotels(SearchParams params) {
+        final var request = SearchParams.toRequest().apply(params);
         final CompletableFuture<GetHotelsResponse> completableRequest = template.convertSendAndReceiveAsType(
                 allHotelsQueueName,
                 request,
@@ -49,7 +52,7 @@ public class DelegatingHotelService {
             logger.debug("Fetched {} hotels.", hotels.size());
             return hotels;
         } catch (ExecutionException | InterruptedException e) {
-             logger.error("Cannot get all hotels from hotel service.", e);
+            logger.error("Cannot get all hotels from hotel service.", e);
         }
         return ImmutableList.of();
     }
@@ -72,5 +75,24 @@ public class DelegatingHotelService {
             logger.error("Error when fetching hotel {} details.", id, e);
         }
         return Optional.empty();
+    }
+
+    @Data
+    @Builder
+    public static class SearchParams {
+        private String destination;
+        private String departure;
+        private Integer adults;
+        private Integer people3To9;
+        private Integer people10To17;
+
+        public static Function<SearchParams, GetHotelsRequest> toRequest() {
+            return params -> GetHotelsRequest.builder()
+                    .destination(params.destination)
+                    .adults(params.adults)
+                    .people3To9(params.people3To9)
+                    .people10To17(params.people10To17)
+                    .build();
+        }
     }
 }

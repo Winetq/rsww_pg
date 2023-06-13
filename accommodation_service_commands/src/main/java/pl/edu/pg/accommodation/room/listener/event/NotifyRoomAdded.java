@@ -26,6 +26,7 @@ public class NotifyRoomAdded {
                 .features(room.getFeatures())
                 .basePrice(room.getPrice())
                 .hotelId(hotelIdSupplier.get())
+                .capacity(room.getCapacity())
                 .build();
     }
 }
