@@ -8,6 +8,6 @@ class Room:
         if "numberOfRooms" in room:
             self.numberOfRooms = room["numberOfRooms"]
 
-        self.basePrice = None
-        if "basePrice" in room:
-            self.basePrice = room["basePrice"]
+        self.price = None
+        if "price" in room:
+            self.price = room["price"]

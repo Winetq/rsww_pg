@@ -15,9 +15,6 @@ class HotelDetails:
         self.city = hotel["city"]
         self.description = hotel["description"]
         self.photo = hotel["photo"]
-        self.rooms = hotel["rooms"]
+        self.rooms = [Room(room) for room in hotel["rooms"]]
         self.airport = hotel["airport"]
         self.food = hotel["food"]
-
-    def getRooms(self):
-        self.rooms = [Room(room) for room in self.rooms]

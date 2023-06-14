@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from trips.AddTripEvent import AddTripEvent
 
 SLEEP_INTERVAL = 0.1
-TIMEOUT = 5
+TIMEOUT = 10
 
 
 def send_message_and_get_response(channel, queue, callback_queue, message=json.dumps({})):
