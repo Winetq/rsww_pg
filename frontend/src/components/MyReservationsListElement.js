@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import ListGroup from "react-bootstrap/ListGroup";
@@ -9,12 +9,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import UrlBuilder from "./UrlBuilder";
 import InfoToast from "../components/InfoToast";
+import AuthContext from "../context/AuthContext";
 
 
 const MyReservationsListElement = ({reservation}) => {
 
     const urlBuilder = new UrlBuilder();
     
+    const {user} = useContext(AuthContext);
+
     let [isPaying, setIsPaying] = useState(false);
     let [isCancelling, setIsCancelling] = useState(false);
 
@@ -32,7 +35,7 @@ const MyReservationsListElement = ({reservation}) => {
         setIsCancelling(true);
 
         let request = new XMLHttpRequest();
-        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+reservation.tripId+'/cancel/', true);
+        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+reservation.id+'/cancel'+`?user=${user.user_id}`, true);
         request.addEventListener('load', (event) => {
             setIsCancelling(false);
             if(event.currentTarget.statusCode !== 200)
@@ -49,7 +52,7 @@ const MyReservationsListElement = ({reservation}) => {
         setIsPaying(true);
 
         let request = new XMLHttpRequest();
-        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+"/"+reservation.tripId+'/payment/', true);
+        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+"/"+reservation.id+'/payment'+`?user=${user.user_id}`, true);
         request.addEventListener('load', (event) => {
             setIsPaying(false);
             if(event.currentTarget.statusCode !== 200)
@@ -65,29 +68,29 @@ const MyReservationsListElement = ({reservation}) => {
         <Card className="w-75 mx-auto p-3 shadow mb-3">
             <div className="row g-0">
                 <div className="col-md-6 my-auto">
-                    <Card.Img src={reservation.trip.hotel.photo} alt="Hotel Image" />
+                    <Card.Img src={reservation.hotel.photo} alt="Hotel Image" />
                 </div>
                 <div className="col-md-6">
                     <Card.Body>
                         <Card.Title className="border-bottom">
                             <h5 className="text-success">
                                 <FontAwesomeIcon icon={faLocationDot} className="me-1 fa-fw"/>
-                                {reservation.trip.hotel.country} | {reservation.trip.hotel.city}
+                                {reservation.hotel.country} | {reservation.hotel.city}
                             </h5>
                         </Card.Title>
                         <ListGroup className="list-group-flush">
                             <ListGroup.Item className="px-1">
                                 <FontAwesomeIcon icon={faCalendar} className="me-1 fa-fw" />
-                                {reservation.trip.transport.departureDateTime}
+                                {reservation.transport.departureDateTime}
                             </ListGroup.Item>
                             <ListGroup.Item className="px-1">
                                 <FontAwesomeIcon icon={faHotel} className="me-1 fa-fw" />
-                                <span className="me-2">{reservation.trip.hotel.name}</span>
-                                {reservation.trip.hotel.stars} <FontAwesomeIcon icon={faStar}/>
+                                <span className="me-2">{reservation.hotel.name}</span>
+                                {reservation.hotel.stars} <FontAwesomeIcon icon={faStar}/>
                             </ListGroup.Item>
                             <ListGroup.Item className="px-1">
                                 <FontAwesomeIcon icon={faCoins} className="me-1 fa-fw" />
-                                {reservation.trip.tripPrice} zł
+                                {reservation.tripPrice} zł
                             </ListGroup.Item>
                         </ListGroup>
                         <div className="mb-2">

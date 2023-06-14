@@ -114,7 +114,7 @@ const TripDetails = () => {
         setIsReserving(true);
 
         let request = new XMLHttpRequest();
-        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+"/"+id+'/reserve/', true);
+        request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+"/"+id+'/reserve', true);
         request.addEventListener('load', (event) => {
             if(event.currentTarget.statusCode !== 202){
                 setIsReservationFailed(true);
@@ -153,10 +153,15 @@ const TripDetails = () => {
 
     let [notifications, setNotifications] = useState(() => null);
     const notifyDelay = 2*1000;
-
     useEffect(() => {
+        let ready = true;
+
         const notifyInterval = setInterval(async () => {
+            if(!ready)
+                return;
+
             setNotifications([]);
+            ready = false;
             
             try{
                 const notify = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+`/${id}/notifications`);
@@ -164,7 +169,8 @@ const TripDetails = () => {
                 setNotifications(notifyResponse.responseText);
             } catch {
                 setNotifications([{notification: 'Could not parse notification :('}]);
-                return;
+            } finally {
+                ready = true;
             }
         }, notifyDelay);
         

@@ -55,10 +55,15 @@ const TripsList = () => {
     
     let [notifications, setNotifications] = useState(() => null);
     const notifyDelay = 2*1000;
-
     useEffect(() => {
+        let ready = true;
+
         const notifyInterval = setInterval(async () => {
+            if(!ready)
+                return;
+            
             setNotifications([]);
+            ready = false;
 
             try{
                 const notify = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_DESTINATION_NOTIFICATIONS')+'?destination='+urlParams.get('destination'));
@@ -66,7 +71,8 @@ const TripsList = () => {
                 setNotifications(notifyResponse.responseText);
             } catch {
                 setNotifications([{notification: 'Could not parse notification :('}]);
-                return;
+            } finally {
+                ready = true;
             }
         }, notifyDelay);
       

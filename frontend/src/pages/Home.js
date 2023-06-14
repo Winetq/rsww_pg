@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -10,6 +10,7 @@ import TripDateInput from "../components/TripDateInput";
 import TripDeparturePlaceInput from "../components/TripDeparturePlaceInput";
 import TripPeopleCollapse from "../components/TripPeopleCollapse";
 import TripsListElementSkeleton from "../components/TripsListElementSkeleton";
+
 import UrlBuilder from "../components/UrlBuilder";
 import InfoToast from "../components/InfoToast";
 import LatestTOUpdatesTable from "../components/LatestTOUpdatesTable";
@@ -90,15 +91,23 @@ const Home = () => {
     let [TOUpdates, setTOUpdates] = useState(null);
     const updatesDelay = 2*1000;
     useEffect(() => {
-        const updateInterval = setInterval(async () => {
-            setTOUpdates([]);
+        let ready = true;
 
-            const update = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TO_LATEST_UPDATES'));
+        const updateInterval = setInterval(async () => {
+            if(!ready)
+                return;
+
+            setTOUpdates([]);
+            ready = false;
+            
             try{
+                const update = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TO_LATEST_UPDATES'));
                 let updatesResponse = await update.json();
                 setTOUpdates(updatesResponse.responseText);
             } catch {
-                return;
+                ;
+            } finally {
+                ready = true;
             }
         }, updatesDelay);
         
