@@ -202,6 +202,7 @@ class TourOperator:
         trips = []
         while trips is None or len(trips) <= 0:
             trips = GetTripsEvent(self.channel, self.callback_queue).trips
+            self.listen()
             time.sleep(self.sleep_time)
 
     def listen(self):
@@ -209,7 +210,7 @@ class TourOperator:
         if method_frame is not None and header_frame is not None:
             reply_to_queue = header_frame.reply_to
             print("TO sended latest updates to " + str(reply_to_queue))
-            GetTOLatestUpdatesEvent(self.channel, reply_to_queue, self.TO_latest_updates.latest_updates)
+            GetTOLatestUpdatesEvent(self.channel, reply_to_queue, header_frame, self.TO_latest_updates.latest_updates)
 
     def generate(self):
         hotel_file_id, flight_file_id = 0, 0
@@ -256,5 +257,5 @@ class TourOperator:
 
 if __name__ == "__main__":
     tour_operator = TourOperator()
-    # tour_operator.generate()
+    tour_operator.generate()
     # tour_operator.close_connection()
