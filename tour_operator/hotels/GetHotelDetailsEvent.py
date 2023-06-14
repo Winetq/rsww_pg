@@ -11,6 +11,10 @@ class GetHotelDetailsEvent:
         mess = {
             "id": hotel.id
         }
-        self.hotel_details = json.loads(send_message_and_get_response(
-            channel, self.get_hotel_details_queue, callback_queue, message=json.dumps(mess)))
-        self.hotel_details = HotelDetails(self.hotel_details)
+        hotel_details = send_message_and_get_response(
+            channel, self.get_hotel_details_queue, callback_queue, message=json.dumps(mess))
+        if hotel_details is not None and hotel_details is not []:
+            hotel_details = json.loads(hotel_details)
+            self.hotel_details = HotelDetails(json.dumps(hotel_details))
+        else:
+            self.hotel_details = HotelDetails(self.hotel_details)
