@@ -19,4 +19,4 @@ class TOLatestUpdates:
         self.latest_updates = sorted(self.latest_updates, key=lambda update: update["time"])
         if len(self.latest_updates) > self.latest_updates_number:
             self.latest_updates = self.latest_updates[-10:]
-        print(len(self.latest_updates))
+        print("Latest updates number: " + str(len(self.latest_updates)))
