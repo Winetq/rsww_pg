@@ -12,11 +12,13 @@ class Flight:
         self.arrivalDate = flight["arrivalDate"]
         self.travelTime = flight["travelTime"]
         self.placesCount = flight["placesCount"]
-        # self.price = flight["price"]
-        self.price = 0
+        self.price = flight["price"]
 
-    def compare(self, flight_dict):
-        flight_dict = json.loads(flight_dict)
+    def compare(self, flight):
+        if not isinstance(flight, str):
+            return False
+
+        flight_dict = json.loads(flight)
         if self.departureAirport != flight_dict["departureAirport"]:
             return False
         if self.arrivalAirport != flight_dict["arrivalAirport"]:

@@ -57,36 +57,46 @@ class TourOperator:
             else:
                 raise ConnectionError('AMQP server is unreachable. Max reconnection tries have been reached')
 
+    def wait_until_hotel_added(self, hotel):
+        hotels = GetHotelsEvent(self.channel, self.callback_queue).hotels
+        result = [h for h in hotels if h.compare(hotel)]
+        while len(result) <= 0:
+            hotels = GetHotelsEvent(self.channel, self.callback_queue).hotels
+            result = [h for h in hotels if h.compare(hotel)]
+            time.sleep(1)
+        return result[0]
+
     def add_hotel(self, hotel):
         message = json.loads(json.dumps(hotel))
         self.channel.basic_publish(exchange='', routing_key=self.add_hotel_queue, body=message)
 
         hotel = HotelDetails(hotel)
-        hotels = GetHotelsEvent(self.channel, self.callback_queue).hotels
-        hotel = [h for h in hotels if h.compare(hotel)]
-        if len(hotel) > 0:
-            hotel = hotel[0]
-            # add trip combinations
+        hotel = self.wait_until_hotel_added(hotel)
+
+        # add trip combinations
+        flights = GetFlightsEvent(self.channel, self.callback_queue).flights
+        generate_trips_for_hotel(self.channel, self.add_trip_queue, hotel, flights)
+
+    def wait_until_flight_added(self, flight):
+        flights = GetFlightsEvent(self.channel, self.callback_queue).flights
+        result = [f for f in flights if f.compare(flight)]
+        while len(result) <= 0:
             flights = GetFlightsEvent(self.channel, self.callback_queue).flights
-            generate_trips_for_hotel(self.channel, self.add_trip_queue, hotel, flights)
-            return True
-        return False
+            result = [f for f in flights if f.compare(flight)]
+            time.sleep(1)
+        return result[0], flights
 
     def add_flight(self, flight):
         message = json.loads(json.dumps(flight))
         self.channel.basic_publish(exchange='', routing_key=self.add_flight_queue, body=message)
 
-        flights = GetFlightsEvent(self.channel, self.callback_queue).flights
-        flight = [f for f in flights if f.compare(flight)]
-        if len(flight) > 0:
-            flight = flight[0]
-            # add trip combinations
-            hotels = GetHotelsEvent(self.channel, self.callback_queue).hotels
-            generate_trips_for_flight(self.channel, self.add_trip_queue, flight, hotels, flights)
-            return True
-        return False
+        flight, flights = self.wait_until_flight_added(flight)
 
-    def delete_trip(self):
+        # add trip combinations
+        hotels = GetHotelsEvent(self.channel, self.callback_queue).hotels
+        generate_trips_for_flight(self.channel, self.add_trip_queue, flight, hotels, flights)
+
+    def remove_trip(self):
         trips = GetTripsEvent(self.channel, self.callback_queue).trips
         if len(trips) > 0:
             trip_to_delete = random.choice(trips)
@@ -114,45 +124,58 @@ class TourOperator:
         new_price = flight_to_update.price * random.randrange(80, 120) // 100
         if new_price == flight_to_update.price:
             new_price = flight_to_update.price * 90 // 100
+        print("Lot " + str(flight_to_update.id) + "   ---   " + str(flight_to_update.price) + " : " + str(new_price))
         UpdateFlightPriceEvent(self.channel, flight_to_update, new_price)
 
-    def generate(self):
+    def read_data_generation(self):
         hotel_file = open('to_data/hotels.json', 'r')
         hotels = hotel_file.readlines()
-        hotel_file_id = 0
-
         flight_file = open('to_data/flights.json', 'r')
         flights = flight_file.readlines()
-        flight_file_id = 0
+        return hotels, flights
+
+    def wait_for_trips(self):
+        trips = []
+        while trips is None or len(trips) <= 0:
+            trips = GetTripsEvent(self.channel, self.callback_queue).trips
+            time.sleep(0.5)
+
+    def generate(self):
+        hotel_file_id, flight_file_id = 0, 0
+        hotels, flights = self.read_data_generation()
+        self.wait_for_trips()
+        print("Start of generating changes by TO")
 
         while True:
-            time.sleep(random.randrange(self.min_wait_time, self.max_wait_time))
-            probability_value = random.randint(0, 5)
+            event_time = random.randrange(self.min_wait_time, self.max_wait_time)
+            time.sleep(event_time)
+            # check_time = 0
+            # while check_time < event_time:
+            #     # sprawdz kolejke
+            #     time.sleep(0.5)
+            #     check_time += 0.5
+
+            probability_value = random.randint(0, 2)
+            print("Random: " + str(probability_value))
             if probability_value == 0:
                 if len(hotels) > hotel_file_id:
-                    if self.add_hotel(hotels[hotel_file_id]):
-                        print("TO added hotel")
-                        hotel_file_id += 1
-                    else:
-                        print("TO tried to add hotel")
+                    self.add_hotel(hotels[hotel_file_id])
+                    print("TO added hotel")
+                    hotel_file_id += 1
             elif probability_value == 1:
                 if len(flights) > flight_file_id:
-                    if self.add_flight(flights[flight_file_id]):
-                        print("TO added flight")
-                        flight_file_id += 1
-                    else:
-                        print("TO tried to add flight")
+                    self.add_flight(flights[flight_file_id])
+                    print("TO added flight")
+                    flight_file_id += 1
             elif probability_value == 2:
-                if self.delete_trip():
-                    print("TO deleted trip")
-                else:
-                    print("TO tried to delete trip")
+                self.change_flight_price()
+                print("TO changed price of flight")
             # elif probability_value == 3:
+            #     if self.remove_trip():
+            #         print("TO removed trip")
+            # elif probability_value == 4:
             #     print("TO changed price of hotel room")
             #     # self.change_room_price()
-            # else:
-            #     self.change_flight_price()
-            #     print("TO changed price of flight")
 
     def close_connection(self):
         self.channel.close()
@@ -161,7 +184,5 @@ class TourOperator:
 
 if __name__ == "__main__":
     tour_operator = TourOperator()
-    # Initializer(tour_operator, 5)
-    # print("Start of generating changes by TO")
     # tour_operator.generate()
     # tour_operator.close_connection()

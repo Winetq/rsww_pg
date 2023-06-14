@@ -11,6 +11,6 @@ class GetHotelDetailsEvent:
         mess = {
             "id": hotel.id
         }
-        hotel_details = json.loads(send_message_and_get_response(
+        self.hotel_details = json.loads(send_message_and_get_response(
             channel, self.get_hotel_details_queue, callback_queue, message=json.dumps(mess)))
-        self.hotel_details = HotelDetails(hotel_details)
+        self.hotel_details = HotelDetails(self.hotel_details)

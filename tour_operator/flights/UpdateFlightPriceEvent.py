@@ -9,5 +9,5 @@ class UpdateFlightPriceEvent:
             "flightId": flight.id,
             "price": new_price
         }
-        message = json.loads(json.dumps(flight_update_event))
+        message = json.dumps(flight_update_event)
         channel.basic_publish(exchange='', routing_key=self.update_flight_price_queue, body=message)
