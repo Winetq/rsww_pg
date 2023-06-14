@@ -159,7 +159,7 @@ const TripDetails = () => {
             setNotifications([]);
             
             try{
-                const notify = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+`${id}/notifications`);
+                const notify = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+`/${id}/notifications`);
                 let notifyResponse = await notify.json();
                 setNotifications(notifyResponse.responseText);
             } catch {
