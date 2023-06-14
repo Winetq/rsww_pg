@@ -44,16 +44,18 @@ public class ReservationEventsListener {
             log.error("Cannot reserve the room for given parameters: {}", eventMessage.getPayload());
             return ReservationResponse.builder().success(false).build();
         }
-        return ReservationResponse.builder().success(true).reservationId(reservation.get().getId()).build();
+        return ReservationResponse.builder()
+                .success(true)
+                .reservationId(reservation.get().getId())
+                .price((double) room.get().getPrice())
+                .build();
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.queue.hotel.reservation.cancel}")
     public void cancelHotelReservationListener(Message<CancelHotelReservationEvent> eventMessage) {
         final var reservationId = eventMessage.getPayload().getReservationId();
         final var reservation = reservationService.getReservation(reservationId);
-        if (reservation.isPresent()) {
-            reservationService.deleteReservation(reservation.get());
-        }
+        reservation.ifPresent(reservationService::deleteReservation);
     }
 
     @RabbitListener(queues = "${spring.rabbitmq.queue.hotel.reservation.confirm}")

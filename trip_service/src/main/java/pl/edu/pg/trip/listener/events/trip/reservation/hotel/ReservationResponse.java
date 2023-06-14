@@ -14,4 +14,5 @@ import lombok.extern.jackson.Jacksonized;
 public class ReservationResponse {
     private Long reservationId;
     private Boolean success;
+    private Double price;
 }

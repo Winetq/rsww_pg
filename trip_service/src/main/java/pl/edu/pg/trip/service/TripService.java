@@ -7,14 +7,17 @@ import org.springframework.stereotype.Service;
 import pl.edu.pg.trip.enity.Transport;
 import pl.edu.pg.trip.enity.Trip;
 import pl.edu.pg.trip.listener.events.trip.TripsRequest;
+import pl.edu.pg.trip.listener.events.trip.TripsResponse;
 import pl.edu.pg.trip.listener.events.trip.reservation.HotelReservationResponse;
 import pl.edu.pg.trip.listener.events.trip.reservation.PostReservationRequest;
 import pl.edu.pg.trip.repository.ReservationRepository;
 import pl.edu.pg.trip.repository.TripRepository;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -91,19 +94,18 @@ public class TripService {
         final var hotelReserved = hotelService.reserve(hotel, room, startFlight.getDepartureDate(),
                 endFlight.getDepartureDate(), foodOption, user);
         if (!hotelReserved.getSuccess()) {
-            hotelService.cancelReservation(hotel, room);
             return false;
         }
 
         final Optional<Long> startFlightReserved = transportService.reserve(startFlight.getId(), 1, user);
         if (startFlightReserved.isEmpty()) {
-            hotelService.cancelReservation(hotel, room);
+            hotelService.cancelReservation(hotelReserved.getReservationId());
             return false;
         }
 
         final Optional<Long> endFlightReserved = transportService.reserve(endFlight.getId(), 1, user);
         if (endFlightReserved.isEmpty()) {
-            hotelService.cancelReservation(hotel, room);
+            hotelService.cancelReservation(hotelReserved.getReservationId());
             transportService.cancelReservation(startFlightReserved.get());
             return false;
         }
@@ -113,10 +115,47 @@ public class TripService {
                 .endFlightReservation(endFlightReserved.get())
                 .userId(user)
                 .hotelId(hotel.getId())
+                .hotelReservation(hotelReserved.getReservationId())
                 .reserved(LocalDateTime.now().plusMinutes(1))
+                .startFlightId(startFlight.getId())
+                .endFlightId(endFlight.getId())
                 .payed(false)
+                .tripId(Math.toIntExact(tripId))
+                .price(hotelReserved.getPrice() + startFlight.getPrice() + endFlight.getPrice())
                 .build();
         reservationRepository.save(reservation);
         return true;
+    }
+
+    public List<TripsResponse.Trip> getReservations(Long userId) {
+        final var reservations = reservationRepository.getUserReservations(userId);
+        final var trips = tripRepository.findTrips(reservations.stream().map(ReservationRepository.Reservation::getTripId).collect(Collectors.toSet()));
+        return reservations.stream().map(reservation -> {
+            final var maybeTrip = trips.parallelStream().filter(t -> t.getTripId().equals(reservation.getTripId())).findFirst();
+            if (maybeTrip.isEmpty()) {
+                return null;
+            }
+            final var trip = maybeTrip.get();
+            final var hotel = hotelService.getHotel(trip.getHotelId()).get();
+            final var startFlight = transportService.getTransport(trip.getStartFlightId()).get();
+            final var endFlight = transportService.getTransport(trip.getEndFlightId()).get();
+            return TripsResponse.Trip.builder()
+                    .id(reservation.getReservationId())
+                    .tripPrice(reservation.getPrice())
+                    .dateStart(startFlight.getDepartureDate())
+                    .dateEnd(endFlight.getDepartureDate())
+                    .hotel(TripsResponse.Hotel.builder()
+                            .id(hotel.getId())
+                            .name(hotel.getName())
+                            .stars(hotel.getStars())
+                            .place(hotel.getPlace())
+                            .photo(hotel.getPhoto())
+                            .build())
+                    .build();
+        }).collect(Collectors.toList());
+    }
+
+    public void confirmReservation(Integer reservation, Long user) {
+        reservationRepository.markAsPayed(reservation);
     }
 }

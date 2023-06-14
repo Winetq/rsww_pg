@@ -1,5 +1,8 @@
 package pl.edu.pg.gateway.trip;
 
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,27 +18,28 @@ import java.util.Optional;
 @Service
 class MyTripService {
     private final RabbitTemplate rabbitTemplate;
-    private final String getTripsQueueName; // TODO: change a queue
+    private final String getUserReservations; // TODO: change a queue
     private final String getTripDetailsQueueName; // TODO: change a queue
 
     @Autowired
     MyTripService(final RabbitTemplate rabbitTemplate,
-                @Value("${spring.rabbitmq.queue.trip.get.all}") final String getTripsQueueName,
+                @Value("${spring.rabbitmq.queue.trips.reservations}") final String getUserReservations,
                 @Value("${spring.rabbitmq.queue.trip.get.details}") final String getTripDetailsQueueName) {
         this.rabbitTemplate = rabbitTemplate;
-        this.getTripsQueueName = getTripsQueueName;
+        this.getUserReservations = getUserReservations;
         this.getTripDetailsQueueName = getTripDetailsQueueName;
     }
 
-    Optional<TripsResponse> getMyTrips() {
-        final TripsRequest request = TripsRequest.builder().build();
-        final TripsResponse response = rabbitTemplate.convertSendAndReceiveAsType(
-                getTripsQueueName,
-                request,
+    Optional<TripsResponse> getMyTrips(Long userId) {
+        final GetUserReservations dto = GetUserReservations.builder().userId(userId).build();
+        final TripsResponse tripsResponse = rabbitTemplate.convertSendAndReceiveAsType(
+                getUserReservations,
+                dto,
                 new ParameterizedTypeReference<>() {
                 }
         );
-        return Optional.ofNullable(response);
+
+        return Optional.ofNullable(tripsResponse);
     }
 
     Optional<TripDetailsResponse> getMyTripDetails(Long id) {
@@ -47,5 +51,12 @@ class MyTripService {
                 }
         );
         return Optional.ofNullable(response);
+    }
+
+    @Data
+    @Builder
+    @Jacksonized
+    public static class GetUserReservations {
+        private Long userId;
     }
 }

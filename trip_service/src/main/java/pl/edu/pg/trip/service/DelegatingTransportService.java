@@ -38,8 +38,8 @@ public class DelegatingTransportService {
                                       @Value("${spring.rabbitmq.queue.getFlightDetailsQueue}") final String flightDetailsQueue,
                                       @Value("${spring.rabbitmq.queue.getFlightsWithParametersQueue}") final String flightsWithQueryQueue,
                                       @Value("${spring.rabbitmq.queue.reserveFlightQueue}") final String reserveFlight,
-                                      @Value("${spring.rabbitmq.queue.reserveFlightQueue}") final String confirmFlight,
-                                      @Value("${spring.rabbitmq.queue.reserveFlightQueue}") final String cancelFlight) {
+                                      @Value("${spring.rabbitmq.queue.confirmFlightReservationQueue}") final String confirmFlight,
+                                      @Value("${spring.rabbitmq.queue.cancelFlightReservationQueue}") final String cancelFlight) {
         this.template = asyncRabbitTemplate;
         this.flightDetailsQueue = flightDetailsQueue;
         this.flightsWithQueryQueue = flightsWithQueryQueue;
@@ -146,13 +146,8 @@ public class DelegatingTransportService {
                 new ParameterizedTypeReference<>() {
                 }
         );
-        try {
-            final var response = completableRequest.get();
-            return response.isStatus();
-        }  catch (ExecutionException | InterruptedException e) {
-            logger.error("Error when canceling reservation: ", e);
-        }
-        return false;
+
+        return true;
     }
 
 }

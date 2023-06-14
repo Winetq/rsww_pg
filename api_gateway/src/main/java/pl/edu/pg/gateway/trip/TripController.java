@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import org.springframework.amqp.support.converter.Jackson2JavaTypeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,8 +75,8 @@ public class TripController {
         return ResponseEntity.ok(tripService.getPossibleDepartures());
     }
 
-    @PostMapping(consumes = MediaType.ALL_VALUE)
-    @RequestMapping("/{id}/reserve/")
+    @PostMapping
+    @RequestMapping("/{id}/reserve")
     ResponseEntity reserveTrip(@PathVariable("id") Long tripId,
                                @RequestBody String request) {
         final var objectMapper = new ObjectMapper();
@@ -88,8 +89,10 @@ public class TripController {
         }
     }
 
-    @PostMapping("{id}/payment")
-    ResponseEntity<String> payForTrip(@PathVariable Long id) {
-        return ResponseEntity.ok("");
+    @PostMapping("/{reservationId}/payment")
+    ResponseEntity payForReservation(@PathVariable("reservationId") Integer reservationId,
+                                     @RequestParam(value = "user", required = true) Long userId) {
+        final var result = tripService.payForTrip(reservationId, userId);
+        return result ? ResponseEntity.accepted().build() : new ResponseEntity(HttpStatusCode.valueOf(400));
     }
 }

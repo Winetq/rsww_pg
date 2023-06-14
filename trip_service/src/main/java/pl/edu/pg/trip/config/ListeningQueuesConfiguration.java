@@ -94,4 +94,13 @@ public class ListeningQueuesConfiguration {
     public Queue reserveTrip(@Value("${spring.rabbitmq.queue.trips.reserve}") final String reserveTrip) {
         return new Queue(reserveTrip, true);
     }
+
+    @Bean
+    public Queue getReservations(@Value("${spring.rabbitmq.queue.trips.reservations}") final String name) {
+        return new Queue(name, true);
+    }
+    @Bean
+    public Queue tripReservationPayment(@Value("${spring.rabbitmq.queue.trips.reservations.payment}") final String name) {
+        return new Queue(name, true);
+    }
 }

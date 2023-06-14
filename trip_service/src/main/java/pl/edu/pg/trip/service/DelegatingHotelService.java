@@ -16,6 +16,7 @@ import pl.edu.pg.trip.listener.events.hotel.GetHotelsRequest;
 import pl.edu.pg.trip.listener.events.hotel.GetHotelsResponse;
 import pl.edu.pg.trip.listener.events.hotel.HotelDetailsResponse;
 import pl.edu.pg.trip.listener.events.trip.reservation.PostReservationRequest;
+import pl.edu.pg.trip.listener.events.trip.reservation.hotel.CancelHotelReservation;
 import pl.edu.pg.trip.listener.events.trip.reservation.hotel.ReservationResponse;
 import pl.edu.pg.trip.listener.events.trip.reservation.hotel.ReserveHotelRequest;
 
@@ -120,7 +121,14 @@ public class DelegatingHotelService {
         return ReservationResponse.builder().success(false).build();
     }
 
-    public boolean cancelReservation(Hotel hotel, PostReservationRequest.Room room) {
+    public boolean cancelReservation(Long reservationId) {
+        final var dto = CancelHotelReservation.builder().reservationId(reservationId).build();
+        template.convertSendAndReceiveAsType(
+                cancelHotelReservationQueueName,
+                dto,
+                new ParameterizedTypeReference<>() {
+                }
+        );
         return true;
     }
 

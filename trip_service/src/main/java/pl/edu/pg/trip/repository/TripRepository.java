@@ -11,8 +11,10 @@ import pl.edu.pg.trip.enity.Trip;
 import pl.edu.pg.trip.storage.MongoDatabaseWrapper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -66,5 +68,14 @@ public class TripRepository {
         mongoDatabaseWrapper.getDatabase()
                 .getCollection(TRIPS_COLLECTION, Trip.class)
                 .deleteOne(query);
+    }
+
+    public Set<Trip> findTrips(final Set<Integer> tripsIds) {
+        final var query = new Document("tripId", new Document("$in", tripsIds));
+        final var result = new HashSet<Trip>();
+        mongoDatabaseWrapper.getDatabase().getCollection(TRIPS_COLLECTION, Trip.class)
+                .find(query)
+                .into(result);
+        return result;
     }
 }
