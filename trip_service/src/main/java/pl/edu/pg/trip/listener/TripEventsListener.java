@@ -10,6 +10,8 @@ import pl.edu.pg.trip.listener.events.trip.TripDetailsRequest;
 import pl.edu.pg.trip.listener.events.trip.TripDetailsResponse;
 import pl.edu.pg.trip.listener.events.trip.TripsRequest;
 import pl.edu.pg.trip.listener.events.trip.TripsResponse;
+import pl.edu.pg.trip.listener.events.trip.reservation.PostReservationRequest;
+import pl.edu.pg.trip.listener.events.trip.reservation.PostReservationResponse;
 import pl.edu.pg.trip.service.DelegatingHotelService;
 import pl.edu.pg.trip.service.DelegatingTransportService;
 import pl.edu.pg.trip.service.TripService;
@@ -58,5 +60,12 @@ public class TripEventsListener {
         final var response = TripsResponse.builder().trips(dtoTrips).build();
         log.debug("Response: {}", response);
         return response;
+    }
+
+    @RabbitListener(queues = "${spring.rabbitmq.queue.trips.reserve}")
+    public PostReservationResponse reserveTrip(PostReservationRequest request, Message message) {
+        log.debug("Request: {}", request);
+        final var reservationResult = tripService.reserveTrip(request.getTripId(), request.getFood(), request.getRoom(), request.getUser());
+        return  PostReservationResponse.builder().reserved(reservationResult).build();
     }
 }

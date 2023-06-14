@@ -12,9 +12,12 @@ import pl.edu.pg.trip.enity.Transport;
 import pl.edu.pg.trip.listener.events.transport.GetFlightDetailsQuery;
 import pl.edu.pg.trip.listener.events.transport.GetFlightDetailsResponse;
 import pl.edu.pg.trip.listener.events.transport.GetFlightsQueryRequest;
+import pl.edu.pg.trip.listener.events.trip.reservation.hotel.ReserveHotelRequest;
+import pl.edu.pg.trip.listener.events.trip.reservation.transport.CancelFlightReservationCommand;
+import pl.edu.pg.trip.listener.events.trip.reservation.transport.ReservationResponse;
+import pl.edu.pg.trip.listener.events.trip.reservation.transport.ReserveFlightCommand;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -25,15 +28,24 @@ public class DelegatingTransportService {
     private final Logger logger = LoggerFactory.getLogger(DelegatingTransportService.class);
     private final String flightDetailsQueue;
     private final String flightsWithQueryQueue;
+    private final String reserveFlight;
+    private final String confirmFlight;
+    private final String cancelFlight;
     private final AsyncRabbitTemplate template;
 
     @Autowired
     public DelegatingTransportService(final AsyncRabbitTemplate asyncRabbitTemplate,
                                       @Value("${spring.rabbitmq.queue.getFlightDetailsQueue}") final String flightDetailsQueue,
-                                      @Value("${spring.rabbitmq.queue.getFlightsWithParametersQueue}") final String flightsWithQueryQueue) {
+                                      @Value("${spring.rabbitmq.queue.getFlightsWithParametersQueue}") final String flightsWithQueryQueue,
+                                      @Value("${spring.rabbitmq.queue.reserveFlightQueue}") final String reserveFlight,
+                                      @Value("${spring.rabbitmq.queue.reserveFlightQueue}") final String confirmFlight,
+                                      @Value("${spring.rabbitmq.queue.reserveFlightQueue}") final String cancelFlight) {
         this.template = asyncRabbitTemplate;
         this.flightDetailsQueue = flightDetailsQueue;
         this.flightsWithQueryQueue = flightsWithQueryQueue;
+        this.reserveFlight = reserveFlight;
+        this.confirmFlight = confirmFlight;
+        this.cancelFlight = cancelFlight;
     }
 
     public List<Transport> getTransports() {
@@ -100,5 +112,47 @@ public class DelegatingTransportService {
         return ImmutableList.of();
     }
 
+    public Optional<Long> reserve(Long flightId, int numberOfPeople, Long user) {
+        final var dto = ReserveFlightCommand.builder()
+                .userId(user)
+                .flightId(flightId)
+                .numberOfPeople(numberOfPeople)
+                .build();
+
+        final CompletableFuture<ReservationResponse> completableRequest = template.convertSendAndReceiveAsType(
+                reserveFlight,
+                dto,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+
+        try {
+            final var response = completableRequest.get();
+            if (response.isStatus()) {
+                return Optional.of(Long.parseLong(response.getMessage().split(":")[1].trim()));
+            }
+            return Optional.empty();
+        }  catch (ExecutionException | InterruptedException e) {
+            logger.error("Cannot reserve the flight with id: {}", flightId, e);
+        }
+        return Optional.empty();
+    }
+
+    public boolean cancelReservation(Long reservationId) {
+        final var dto = CancelFlightReservationCommand.builder().reservationId(reservationId).build();
+        final CompletableFuture<ReservationResponse> completableRequest = template.convertSendAndReceiveAsType(
+                cancelFlight,
+                dto,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        try {
+            final var response = completableRequest.get();
+            return response.isStatus();
+        }  catch (ExecutionException | InterruptedException e) {
+            logger.error("Error when canceling reservation: ", e);
+        }
+        return false;
+    }
 
 }

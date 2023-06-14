@@ -2,8 +2,8 @@ package pl.edu.pg.accommodation.hotel.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.edu.pg.accommodation.hotel.notifier.HotelEventNotifier;
 import pl.edu.pg.accommodation.hotel.entity.HotelEntity;
+import pl.edu.pg.accommodation.hotel.notifier.HotelEventNotifier;
 import pl.edu.pg.accommodation.hotel.repository.HotelRepository;
 
 import java.util.Optional;

@@ -89,4 +89,9 @@ public class ListeningQueuesConfiguration {
     public Queue removeTripQueue(@Value("${spring.rabbitmq.queue.trip.remove}") final String removeTripQueueName) {
         return new Queue(removeTripQueueName, true);
     }
+
+    @Bean
+    public Queue reserveTrip(@Value("${spring.rabbitmq.queue.trips.reserve}") final String reserveTrip) {
+        return new Queue(reserveTrip, true);
+    }
 }

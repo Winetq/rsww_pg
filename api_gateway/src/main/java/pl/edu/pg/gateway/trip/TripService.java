@@ -19,6 +19,8 @@ import pl.edu.pg.gateway.trip.dto.TripDetailsRequest;
 import pl.edu.pg.gateway.trip.dto.TripDetailsResponse;
 import pl.edu.pg.gateway.trip.dto.TripsRequest;
 import pl.edu.pg.gateway.trip.dto.TripsResponse;
+import pl.edu.pg.gateway.trip.dto.reservation.PostReservationRequest;
+import pl.edu.pg.gateway.trip.dto.reservation.PostReservationResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,18 +34,24 @@ public class TripService {
     private final String getTripDetailsQueueName;
     private final String getDestinationsQueueName;
     private final String getDeparturesQueueName;
+    private final String reserveTripQueueName;
+    private final String rollbackReservationTripQueueName;
 
     @Autowired
     TripService(final RabbitTemplate rabbitTemplate,
                 @Value("${spring.rabbitmq.queue.trip.get.all}") final String getTripsQueueName,
                 @Value("${spring.rabbitmq.queue.trip.get.details}") final String getTripDetailsQueueName,
                 @Value("${spring.rabbitmq.queue.hotel.destinations}") final String getDestinationsQueueName,
-                @Value("${spring.rabbitmq.queue.hotels.departures}") final String getDeparturesQueueName) {
+                @Value("${spring.rabbitmq.queue.hotels.departures}") final String getDeparturesQueueName,
+                @Value("${spring.rabbitmq.queue.trips.reserve}") final String reserveTripQueueName,
+                @Value("${spring.rabbitmq.queue.trips.reserve.rollback}") final String rollbackReservationTripQueueName) {
         this.rabbitTemplate = rabbitTemplate;
         this.getTripsQueueName = getTripsQueueName;
         this.getTripDetailsQueueName = getTripDetailsQueueName;
         this.getDestinationsQueueName = getDestinationsQueueName;
         this.getDeparturesQueueName = getDeparturesQueueName;
+        this.reserveTripQueueName = reserveTripQueueName;
+        this.rollbackReservationTripQueueName = rollbackReservationTripQueueName;
     }
 
     public Optional<TripsResponse> getTrips(final SearchParams searchParams) {
@@ -88,6 +96,26 @@ public class TripService {
                 }
         );
         return response.getDepartures();
+    }
+
+    public boolean reserve(final Long tripId, PostReservationRequest reservationRequest) {
+        final PostReservationResponse response = rabbitTemplate.convertSendAndReceiveAsType(
+                reserveTripQueueName,
+                reservationRequest,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        return response.isReserved();
+    }
+
+    public boolean rollbackReservation(final Long tripId, PostReservationRequest reservationRequest) {
+        final PostReservationResponse response = rabbitTemplate.convertSendAndReceiveAsType(
+                rollbackReservationTripQueueName,
+                reservationRequest,
+                new ParameterizedTypeReference<>() {
+                }
+        );
+        return true;
     }
 
     @Data

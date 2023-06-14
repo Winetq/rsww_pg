@@ -48,4 +48,14 @@ public class ListeningQueuesConfig {
     public Queue destinationsQueue(@Value("${spring.rabbitmq.queue.hotel.destinations}") String queueName) {
         return new Queue(queueName, true);
     }
+
+    @Bean
+    public Queue addReservationQueue(@Value("${spring.rabbitmq.fanout.reservation.add}") String queueName) {
+        return new Queue(queueName, true);
+    }
+
+    @Bean
+    public Queue removeReservationQueue(@Value("${spring.rabbitmq.fanout.reservation.remove}") String queueName) {
+        return new Queue(queueName, true);
+    }
 }

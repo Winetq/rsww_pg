@@ -14,4 +14,5 @@ public class Trip {
     private Long hotelId;
     private Long startFlightId;
     private Long endFlightId;
+    private Float price;
 }

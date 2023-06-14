@@ -1,22 +1,20 @@
 package pl.edu.pg.trip.service;
 
-import com.google.common.collect.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.edu.pg.trip.enity.Hotel;
 import pl.edu.pg.trip.enity.Transport;
 import pl.edu.pg.trip.enity.Trip;
 import pl.edu.pg.trip.listener.events.trip.TripsRequest;
+import pl.edu.pg.trip.listener.events.trip.reservation.HotelReservationResponse;
+import pl.edu.pg.trip.listener.events.trip.reservation.PostReservationRequest;
+import pl.edu.pg.trip.repository.ReservationRepository;
 import pl.edu.pg.trip.repository.TripRepository;
 
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,15 +23,20 @@ public class TripService {
     private final TripRepository tripRepository;
     private final DelegatingTransportService transportService;
     private final DelegatingHotelService hotelService;
-    private AtomicLong idAccessor;
+    private final PaymentService paymentService;
+    private final ReservationRepository reservationRepository;
 
     @Autowired
     public TripService(final TripRepository tripRepository,
                        final DelegatingHotelService delegatingHotelService,
-                       final DelegatingTransportService transportService) {
+                       final DelegatingTransportService transportService,
+                       final PaymentService paymentService,
+                       final ReservationRepository reservationRepository) {
         this.tripRepository = tripRepository;
         this.hotelService = delegatingHotelService;
         this.transportService = transportService;
+        this.paymentService = paymentService;
+        this.reservationRepository = reservationRepository;
     }
 
     public List<Trip> getTrips(TripsRequest request) {
@@ -76,5 +79,44 @@ public class TripService {
 
     public void removeTrip(Long id) {
         tripRepository.delete(id);
+    }
+
+    public boolean reserveTrip(final Long tripId, final String foodOption, final PostReservationRequest.Room room,
+                               final Long user) {
+        final var trip = getTrip(tripId);
+        final var hotel = hotelService.getHotel(trip.get().getHotelId()).get();
+        final var startFlight = transportService.getTransport(trip.get().getStartFlightId()).get();
+        final var endFlight = transportService.getTransport(trip.get().getStartFlightId()).get();
+
+        final var hotelReserved = hotelService.reserve(hotel, room, startFlight.getDepartureDate(),
+                endFlight.getDepartureDate(), foodOption, user);
+        if (!hotelReserved.getSuccess()) {
+            hotelService.cancelReservation(hotel, room);
+            return false;
+        }
+
+        final Optional<Long> startFlightReserved = transportService.reserve(startFlight.getId(), 1, user);
+        if (startFlightReserved.isEmpty()) {
+            hotelService.cancelReservation(hotel, room);
+            return false;
+        }
+
+        final Optional<Long> endFlightReserved = transportService.reserve(endFlight.getId(), 1, user);
+        if (endFlightReserved.isEmpty()) {
+            hotelService.cancelReservation(hotel, room);
+            transportService.cancelReservation(startFlightReserved.get());
+            return false;
+        }
+
+        final var reservation = ReservationRepository.Reservation.builder()
+                .startFlightReservation(startFlightReserved.get())
+                .endFlightReservation(endFlightReserved.get())
+                .userId(user)
+                .hotelId(hotel.getId())
+                .reserved(LocalDateTime.now().plusMinutes(1))
+                .payed(false)
+                .build();
+        reservationRepository.save(reservation);
+        return true;
     }
 }
