@@ -4,7 +4,6 @@ import time
 import pika
 import random
 
-from flights.Flight import Flight
 from flights.GetFlightsEvent import GetFlightsEvent
 from flights.UpdateFlightPriceEvent import UpdateFlightPriceEvent
 from hotels.GetHotelDetailsEvent import GetHotelDetailsEvent
@@ -16,7 +15,6 @@ from to.GetTOLatestUpdatesEvent import GetTOLatestUpdatesEvent
 from to.TOLatestUpdates import TOLatestUpdates
 from trips.DeleteTripEvent import DeleteTripEvent
 from trips.GetTripsEvent import GetTripsEvent
-from trips.Trip import Trip
 
 
 class TourOperator:
@@ -75,17 +73,40 @@ class TourOperator:
             time.sleep(self.sleep_time)
         return result[0]
 
-    def add_hotel(self, hotel):
-        message = json.loads(json.dumps(hotel))
-        self.channel.basic_publish(exchange='', routing_key=self.add_hotel_queue, body=message)
+    def check_if_hotel_exist(self, hotels_file, hotel_file_id):
+        hotels = GetHotelsEvent(self.channel, self.callback_queue).hotels
+        if len(hotels) < 0:
+            return False, hotel_file_id
+        # check if hotel already has been added
+        hotel_details = HotelDetails(hotels_file[hotel_file_id])
+        hotel = [h for h in hotels if h.compare(hotel_details)]
+        if len(hotel) <= 0:
+            return False, hotel_file_id
 
-        hotel = HotelDetails(hotel)
-        hotel = self.wait_until_hotel_added(hotel)
+        # look for another hotel that has not been added yet
+        while len(hotel) > 0 and len(hotels_file) > hotel_file_id:
+            hotel_file_id += 1
+            hotel_details = HotelDetails(hotels_file[hotel_file_id])
+            hotel = [h for h in hotels if h.compare(hotel_details)]
+        if len(hotel) <= 0:
+            return False, hotel_file_id
+        return True, hotel_file_id
+
+    def add_hotel(self, hotels_file, hotel_file_id):
+        hotel_exist, hotel_file_id = self.check_if_hotel_exist(hotels_file, hotel_file_id)
+        if hotel_exist or len(hotels_file) <= hotel_file_id:
+            return hotel_file_id
+
+        # add new hotel
+        message = json.loads(json.dumps(hotels_file[hotel_file_id]))
+        self.channel.basic_publish(exchange='', routing_key=self.add_hotel_queue, body=message)
+        hotel = self.wait_until_hotel_added(HotelDetails(hotels_file[hotel_file_id]))
 
         # add trip combinations
         flights = GetFlightsEvent(self.channel, self.callback_queue).flights
         generate_trips_for_hotel(self.channel, self.add_trip_queue, hotel, flights)
         self.TO_latest_updates.add_update("Dodano hotel " + str(hotel.name))
+        return hotel_file_id
 
     def wait_until_flight_added(self, flight):
         flights = GetFlightsEvent(self.channel, self.callback_queue).flights
@@ -96,17 +117,39 @@ class TourOperator:
             time.sleep(self.sleep_time)
         return result[0], flights
 
-    def add_flight(self, flight):
-        message = json.loads(json.dumps(flight))
-        self.channel.basic_publish(exchange='', routing_key=self.add_flight_queue, body=message)
+    def check_if_flight_exist(self, flights_file, flight_file_id):
+        flights = GetFlightsEvent(self.channel, self.callback_queue).flights
+        if len(flights) <= 0:
+            return False, flight_file_id
+        # check if flight already has been added
+        flight = [f for f in flights if f.compare(flights_file[flight_file_id])]
+        if len(flight) <= 0:
+            return False, flight_file_id
 
-        flight, flights = self.wait_until_flight_added(flight)
+        # look for another flight that has not been added yet
+        while len(flight) > 0 and len(flights_file) > flight_file_id:
+            flight_file_id += 1
+            flight = [f for f in flights if f.compare(flights_file[flight_file_id])]
+        if len(flight) <= 0:
+            return False, flight_file_id
+        return True, flight_file_id
+
+    def add_flight(self, flights_file, flight_file_id):
+        flight_exist, flight_file_id = self.check_if_flight_exist(flights_file, flight_file_id)
+        if flight_exist or len(flights_file) <= flight_file_id:
+            return flight_file_id
+
+        # add new flight
+        message = json.loads(json.dumps(flights_file[flight_file_id]))
+        self.channel.basic_publish(exchange='', routing_key=self.add_flight_queue, body=message)
+        flight, flights = self.wait_until_flight_added(flights_file[flight_file_id])
 
         # add trip combinations
         hotels = GetHotelsEvent(self.channel, self.callback_queue).hotels
         generate_trips_for_flight(self.channel, self.add_trip_queue, flight, hotels, flights)
         self.TO_latest_updates.add_update(
             "Dodano lot z " + str(flight.departureAirport) + " do " + str(flight.arrivalAirport))
+        return flight_file_id
 
     def remove_trip(self):
         trips = GetTripsEvent(self.channel, self.callback_queue).trips
@@ -136,6 +179,8 @@ class TourOperator:
 
     def change_flight_price(self):
         flights = GetFlightsEvent(self.channel, self.callback_queue).flights
+        if len(flights) <= 0:
+            return False
         flight_to_update = random.choice(flights)
         new_price = flight_to_update.price * random.randrange(80, 120) // 100
         if new_price == flight_to_update.price:
@@ -144,6 +189,7 @@ class TourOperator:
         self.TO_latest_updates.add_update(
             "Zmieniono cene lotu " + str(flight_to_update.departureAirport) + " - " +
             str(flight_to_update.arrivalAirport) + " z " + str(flight_to_update.price) + " na " + str(new_price))
+        return True
 
     def read_data_generation(self):
         hotel_file = open('to_data/hotels.json', 'r')
@@ -162,6 +208,7 @@ class TourOperator:
         method_frame, header_frame, body = self.channel.basic_get(queue=self.get_TO_latest_updates_queue, auto_ack=True)
         if method_frame is not None and header_frame is not None:
             reply_to_queue = header_frame.reply_to
+            print("TO sended latest updates to " + str(reply_to_queue))
             GetTOLatestUpdatesEvent(self.channel, reply_to_queue, self.TO_latest_updates.latest_updates)
 
     def generate(self):
@@ -182,17 +229,19 @@ class TourOperator:
             print("Random: " + str(probability_value))
             if probability_value == 0:
                 if len(hotels) > hotel_file_id:
-                    self.add_hotel(hotels[hotel_file_id])
-                    print("TO added hotel")
-                    hotel_file_id += 1
+                    hotel_file_id = self.add_hotel(hotels, hotel_file_id)
+                    if len(hotels) > hotel_file_id:
+                        print("TO added hotel")
+                        hotel_file_id += 1
             elif probability_value == 1:
                 if len(flights) > flight_file_id:
-                    self.add_flight(flights[flight_file_id])
-                    print("TO added flight")
-                    flight_file_id += 1
+                    flight_file_id = self.add_flight(flights, flight_file_id)
+                    if len(flights) > flight_file_id:
+                        print("TO added flight")
+                        flight_file_id += 1
             elif probability_value == 2:
-                self.change_flight_price()
-                print("TO changed price of flight")
+                if self.change_flight_price():
+                    print("TO changed price of flight")
             elif probability_value == 3:
                 if self.remove_trip():
                     print("TO removed trip")

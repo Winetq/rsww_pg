@@ -7,7 +7,6 @@ from hotels.HotelDetails import HotelDetails
 class GetHotelDetailsEvent:
     def __init__(self, channel, callback_queue, hotel):
         self.get_hotel_details_queue = os.environ.get('GET_HOTEL_DETAILS_QUEUE', 'GetHotelDetailsQueue')
-        # TODO: check if id or hotelId
         mess = {
             "id": hotel.id
         }
