@@ -8,6 +8,7 @@ import org.springframework.messaging.Message;
 import org.springframework.stereotype.Component;
 import pl.edu.pg.accommodation.hotel.listener.event.AddHotelEvent;
 import pl.edu.pg.accommodation.hotel.listener.event.DeleteHotelEvent;
+import pl.edu.pg.accommodation.hotel.listener.event.UpdateRoomPriceEvent;
 import pl.edu.pg.accommodation.hotel.service.HotelService;
 import pl.edu.pg.accommodation.room.service.RoomService;
 
@@ -44,5 +45,22 @@ public class HotelEventsListener {
         log.debug("Event: {}", eventMessage);
         final var maybeHotel = hotelService.findHotelById(eventMessage.getPayload().getHotelId());
         maybeHotel.ifPresent(hotelService::deleteHotel);
+    }
+
+    @RabbitListener(queues="${spring.rabbitmq.queue.update.hotel.price}")
+    public void updateHotelPrice(Message<UpdateRoomPriceEvent> eventMessage) {
+        final var hotel = hotelService.findHotelById(eventMessage.getPayload().getHotelId());
+        if (hotel.isEmpty()) {
+            return;
+        }
+        final var maybeRoom = roomService.findAllRoomsInHotel(hotel.get()).stream()
+                .filter(room -> room.getCapacity() == eventMessage.getPayload().getRoom().getCapacity())
+                .filter(room -> room.getName().equals(eventMessage.getPayload().getRoom().getName()))
+                .filter(room -> room.getFeatures().equals(eventMessage.getPayload().getRoom().getFeatures()))
+                .findAny();
+        if (maybeRoom.isEmpty()) {
+            return;
+        }
+        roomService.update(maybeRoom.get(), eventMessage.getPayload().getNewPrice());
     }
 }

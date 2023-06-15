@@ -5,6 +5,7 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,5 +76,16 @@ public class HotelRepository {
         final var allHotels = new HashSet<String>();
         mongoDb.getDatabase().getCollection(HOTEL_COLLECTION, Hotel.class).distinct("country", String.class).into(allHotels);
         return allHotels;
+    }
+
+
+    public void updateRoomPrice(Room room, final long hotelId) {
+        final var query = new BasicDBObject();
+        query.put("_id", hotelId);
+        final var modifier = new Document("$set", new Document("rooms.price", room.getPrice()));
+
+        mongoDb.getDatabase().getCollection(HOTEL_COLLECTION, Hotel.class)
+                .updateOne(query, modifier);
+
     }
 }

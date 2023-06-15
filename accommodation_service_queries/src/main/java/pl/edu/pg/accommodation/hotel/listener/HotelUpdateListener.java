@@ -44,4 +44,10 @@ public class HotelUpdateListener {
     public void removeRoomUpdate() {
 
     }
+
+    @RabbitListener(queues = "${spring.rabbitmq.queue.update.hotel.price.notify}")
+    public void roomPriceUpdated(final AddRoomEvent updatedRoom) {
+        final var room = AddRoomEvent.dtoToEntityMapper().apply(updatedRoom);
+        hotelService.updateRoomPrice(room, updatedRoom.getHotelId());
+    }
 }

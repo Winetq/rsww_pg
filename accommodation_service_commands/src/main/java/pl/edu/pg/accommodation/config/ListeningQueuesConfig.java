@@ -59,4 +59,9 @@ public class ListeningQueuesConfig {
     Queue pingQueue(@Value("${spring.rabbitmq.ping.queue}") String pingQueue) {
         return new Queue(pingQueue, true);
     }
+
+    @Bean(name="hotelPriceUpdate")
+    Queue hotelPriceUpdate(@Value("${spring.rabbitmq.queue.update.hotel.price}") String name) {
+        return new Queue(name, true);
+    }
 }

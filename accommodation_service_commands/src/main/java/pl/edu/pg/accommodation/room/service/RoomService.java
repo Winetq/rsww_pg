@@ -8,7 +8,9 @@ import pl.edu.pg.accommodation.room.entity.RoomEntity;
 import pl.edu.pg.accommodation.room.notifier.RoomEventNotifier;
 import pl.edu.pg.accommodation.room.repository.RoomRepository;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class RoomService {
@@ -39,8 +41,13 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
-    public Iterable<RoomEntity> findAllRoomsInHotel(final HotelEntity hotel) {
-        return roomRepository.findAllByHotel(hotel);
+    public Set<RoomEntity> findAllRoomsInHotel(final HotelEntity hotel) {
+        return new HashSet<>(roomRepository.findAllByHotel(hotel));
+    }
+
+    public void update(final RoomEntity room, float newPrice) {
+        roomRepository.updatePriceBy(newPrice);
+        notifier.notifyPriceUpdate(findRoom(room.getId()).get());
     }
 
     public Optional<RoomEntity> findRoom(final Long roomId) {

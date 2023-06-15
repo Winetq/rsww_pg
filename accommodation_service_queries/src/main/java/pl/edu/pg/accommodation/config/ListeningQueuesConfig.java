@@ -58,4 +58,8 @@ public class ListeningQueuesConfig {
     public Queue removeReservationQueue(@Value("${spring.rabbitmq.fanout.reservation.remove}") String queueName) {
         return new Queue(queueName, true);
     }
+    @Bean
+    public Queue updateRoomPrice(@Value("${spring.rabbitmq.queue.update.hotel.price.notify}") String queueName) {
+        return new Queue(queueName, true);
+    }
 }
