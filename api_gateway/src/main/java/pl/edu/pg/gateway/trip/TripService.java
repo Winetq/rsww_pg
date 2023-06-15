@@ -14,6 +14,7 @@ import pl.edu.pg.gateway.trip.dto.GetDeparturesRequest;
 import pl.edu.pg.gateway.trip.dto.GetDeparturesResponse;
 import pl.edu.pg.gateway.trip.dto.GetDestinationRequest;
 import pl.edu.pg.gateway.trip.dto.GetDestinationsResponse;
+import pl.edu.pg.gateway.trip.dto.NotificationResponse;
 import pl.edu.pg.gateway.trip.dto.TripDetailsRequest;
 import pl.edu.pg.gateway.trip.dto.TripDetailsResponse;
 import pl.edu.pg.gateway.trip.dto.TripsRequest;
@@ -23,6 +24,7 @@ import pl.edu.pg.gateway.trip.dto.reservation.PostReservationResponse;
 import pl.edu.pg.gateway.trip.dto.reservation.TripReservationPayment;
 import pl.edu.pg.gateway.trip.dto.reservation.TripReservationPaymentResponse;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -38,6 +40,7 @@ public class TripService {
     private final String reserveTripQueueName;
     private final String rollbackReservationTripQueueName;
     private final String paymentQueue;
+    private final String timeoutInSeconds;
 
     @Autowired
     TripService(final RabbitTemplate rabbitTemplate,
@@ -47,7 +50,8 @@ public class TripService {
                 @Value("${spring.rabbitmq.queue.hotels.departures}") final String getDeparturesQueueName,
                 @Value("${spring.rabbitmq.queue.trips.reserve}") final String reserveTripQueueName,
                 @Value("${spring.rabbitmq.queue.trips.reserve.rollback}") final String rollbackReservationTripQueueName,
-                @Value("${spring.rabbitmq.queue.trips.reservations.payment}") final String paymentQueue) {
+                @Value("${spring.rabbitmq.queue.trips.reservations.payment}") final String paymentQueue,
+                @Value("${spring.rabbitmq.timeout}") final String timeoutInSeconds) {
         this.rabbitTemplate = rabbitTemplate;
         this.getTripsQueueName = getTripsQueueName;
         this.getTripDetailsQueueName = getTripDetailsQueueName;
@@ -56,6 +60,7 @@ public class TripService {
         this.reserveTripQueueName = reserveTripQueueName;
         this.rollbackReservationTripQueueName = rollbackReservationTripQueueName;
         this.paymentQueue = paymentQueue;
+        this.timeoutInSeconds = timeoutInSeconds;
     }
 
     public Optional<TripsResponse> getTrips(final SearchParams searchParams) {
@@ -141,6 +146,14 @@ public class TripService {
 //            log.error("Exception during processing the payment communication: ", e);
 //        }
 //        return false;
+    }
+
+    public List<NotificationResponse> getNotifications(Long tripId) {
+        return Arrays.asList(NotificationResponse.builder().notification("essa").build(), NotificationResponse.builder().notification("xd").build());
+    }
+
+    public List<NotificationResponse> getNotifications(String destination) {
+        return Arrays.asList(NotificationResponse.builder().notification("essa").build(), NotificationResponse.builder().notification("xd").build());
     }
 
     @Data
