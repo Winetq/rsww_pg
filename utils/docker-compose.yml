@@ -82,7 +82,7 @@ services:
       - RABBIT_PORT=5672
       - RABBIT_USR=guest
       - RABBIT_PWD=guest
-      - TIMEOUT=2
+      - TIMEOUT=3
 
   userservice:
     container_name: 'userservice'

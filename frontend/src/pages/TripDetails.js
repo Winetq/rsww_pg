@@ -119,20 +119,6 @@ const TripDetails = () => {
             if(event.currentTarget.status !== 202){
                 setIsReservationFailed(true);
             } else {
-                // let reservations = sessionStorage.getItem('reservations');
-                // if(reservations == null)
-                //     reservations = [];
-                // else
-                //     reservations = JSON.parse(reservations);
-                
-                // reservations.push({
-                //     tripId: id,
-                //     trip: data,
-                //     room: room,
-                //     food: food
-                // });
-                // sessionStorage.setItem('reservations', JSON.stringify(reservations));
-
                 setReserved(true);
                 setIsReservationSucceeded(true);
             }
@@ -273,6 +259,29 @@ const TripDetails = () => {
                     <div><FontAwesomeIcon icon={faPlaneArrival} className="fa-fw me-1"/>Arrival</div>
                     <div>{data.transport.arrivalAirport}</div>
                     <div>{data.transport.arrivalDate}</div>
+                </div>
+            </div>
+            <div className="mb-2 pb-2 text-success border-bottom d-flex justify-content-start w-100 align-items-top">
+                <FontAwesomeIcon icon={faTruckPlane} className="fa-fw me-2 bg-success p-2 rounded text-white my-auto" />
+                <div className="me-2">
+                    <div><FontAwesomeIcon icon={faPlaneArrival} className="fa-fw me-1 fa-flip-horizontal"/> Arrival</div>
+                    <div>{data.returnTransport.arrivalAirport}</div>
+                    <div>{data.returnTransport.arrivalDate}</div>
+                </div>
+                <div className="mx-3 my-auto">
+                    <FontAwesomeIcon icon={faRightLong} className="fa-flip-horizontal"/>
+                </div>
+                <div className="mx-2 text-center">
+                    <div><FontAwesomeIcon icon={faClock} className="fa-fw me-1"/>Travel time</div>
+                    <div>{data.returnTransport.travelTime} min</div>
+                </div>
+                <div className="mx-3 my-auto">
+                    <FontAwesomeIcon icon={faRightLong} className="fa-flip-horizontal"/>
+                </div>
+                <div className="mx-2">
+                    <div><FontAwesomeIcon icon={faPlaneDeparture} className="fa-fw me-1 fa-flip-horizontal"/>Departure</div>
+                    <div>{data.returnTransport.departureAirport}</div>
+                    <div>{data.returnTransport.departureDateTime}</div>
                 </div>
             </div>
             <div className="border-bottom pb-2 mb-2">

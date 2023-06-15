@@ -14,7 +14,7 @@ function NotificationToast({ variant, content, onClose }) {
     }
 
     return (
-        <Toast show={show} onClose={toggleShow} autohide={true} delay={1500}>
+        <Toast show={show} onClose={toggleShow} autohide={true} delay={3000}>
             <Toast.Header closeButton={false} className={"fw-bold " + (
                 variant === 'success' ? "bg-success" : 
                 variant === 'warning' ? "bg-warning" : 
