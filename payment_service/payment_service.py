@@ -10,8 +10,8 @@ class AMQPConsumer:
     def __init__(self):
         self.address = os.environ.get('AMQP_URL', '127.0.0.1')
         self.payment_queue = os.environ.get('PAYMENT_QUEUE', 'PaymentQueue')
-        self.reconnection_tries = os.environ.get('AMQP_RECONNECTION_TRIES', 10)
-        self.reconnection_delay = os.environ.get('AMQP_RECONNECTION_DELAY', 5)
+        self.reconnection_tries = os.environ.get('AMQP_RECONNECTION_TRIES', 20)
+        self.reconnection_delay = os.environ.get('AMQP_RECONNECTION_DELAY', 8)
         self.rejection_probability = int(os.environ.get('REJECTION_PROBABILITY', 10))
         self.connection_tries = 0
         self.connection = None
