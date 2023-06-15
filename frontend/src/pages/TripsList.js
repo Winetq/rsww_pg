@@ -55,7 +55,7 @@ const TripsList = () => {
     // data = exampleTrips.trips;
     
     let [notifications, setNotifications] = useState(() => []);
-    const notifyDelay = 2*1000;
+    const notifyDelay = Number.parseInt(process.env['REACT_APP_NOTIFICATIONS_DELAY_MS']);;
     useEffect(() => {
         let ready = true;
 
@@ -102,7 +102,7 @@ const TripsList = () => {
                 ))
             }
 
-            <ToastContainer className="m-3" position="top-end" style={{zIndex: 69}}>
+            <ToastContainer className="m-3 position-fixed" position="top-end" style={{zIndex: 69}}>
             { notifications ? 
                 notifications.map((notification, idx) => (
                     <NotificationToast variant="warning" content={notification.notification} key={idx} />

@@ -59,6 +59,8 @@ const Home = () => {
     let [people10To17, setPeople10To17] = useState(0);
     let [peopleOver18, setPeopleOver18] = useState(0);
     let [peopleCollapseOpen, setPeopleCollapseOpen] = useState(false);
+    let [isPeopleLTEZero, setIsPeopleLTEZero] = useState(false);
+    const toggleIsPeopleLTEZero = () => setIsPeopleLTEZero(!isPeopleLTEZero);
 
     const maxParticipants = 8;
     const navigate = useNavigate();
@@ -73,6 +75,11 @@ const Home = () => {
 
     let handleSubmit = (event) => {
         event.preventDefault();
+        if(people3To9+people10To17+peopleOver18 <= 0){
+            setIsPeopleLTEZero(true);
+            return;
+        }
+
         const startDateObj = new Date(Date.parse(startDate));
         let urlParams = `?destination=${destination}&` + 
             `startDate=${zeroPader(startDateObj.getDate()) + "." + zeroPader(startDateObj.getMonth()+1) + "." + startDateObj.getFullYear()}&` +
@@ -92,7 +99,7 @@ const Home = () => {
     let [isToUpdatessPending, setIsTOUpdatesPending] = useState(false);
     let ready = true;
 
-    const updatesDelay = 2*1000;
+    const updatesDelay = Number.parseInt(process.env['REACT_APP_TO_UPDATES_DELAY_MS']);
     const updateTOLatestUpdates = async () => {
         if(!ready)
             return;
@@ -196,6 +203,8 @@ const Home = () => {
                     <TripsListElementSkeleton />
                 }
             </div>
+
+            {isPeopleLTEZero ? <InfoToast variant="danger" content="Please select any participant" onClose={toggleIsPeopleLTEZero}/> : null}
         </div>
     )
 }

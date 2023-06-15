@@ -55,7 +55,8 @@ const MyReservationsListElement = ({reservation}) => {
         request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+"/"+reservation.id+'/payment'+`?user=${user.user_id}`, true);
         request.addEventListener('load', (event) => {
             setIsPaying(false);
-            if(event.currentTarget.statusCode !== 200)
+
+            if(event.currentTarget.status !== 202)
                 setIsPaymentFailed(true);
             else 
                 setIsPaymentSucceeded(true);
@@ -103,7 +104,7 @@ const MyReservationsListElement = ({reservation}) => {
                             :
                                 <Button 
                                     variant="outline-success" 
-                                    className={"w-100 " + isPaymentSucceeded ? "disabled " : null} 
+                                    className={"w-100 " + (isPaymentSucceeded ? "disabled " : null)} 
                                     onClick={handlePayForReservationClick}
                                 >
                                     <FontAwesomeIcon icon={faCreditCard} className="fa-fw me-1" />
@@ -132,7 +133,7 @@ const MyReservationsListElement = ({reservation}) => {
         {/* {isCancellingFailed ? <InfoToast variant="danger" content={"Cancelling reservation failed"} onClose={toggleIsCancellingFailed} /> : null} */}
         {/* {isCancellingSucceeded ? <InfoToast variant="success" content={"Cancelling reservation succeeded"} onClose={toggleIsCancellingSucceeded} /> : null} */}
         {isPaymentFailed ? <InfoToast variant="danger" content={"Payment for reservation failed"} onClose={toggleIsPaymentFailed} /> : null}
-        {isPaymentSucceeded ? <InfoToast variant="success" content={"Payment for reservation succeeded"} onClose={toggleIsPaymentSucceeded} /> : null}
+        {isPaymentSucceeded ? <InfoToast variant="success" content={"Payment for reservation succeeded"} /> : null}
         </div>
     )
 }

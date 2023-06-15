@@ -152,7 +152,7 @@ const TripDetails = () => {
         });
 
     let [notifications, setNotifications] = useState(() => null);
-    const notifyDelay = 2*1000;
+    const notifyDelay = Number.parseInt(process.env['REACT_APP_NOTIFICATIONS_DELAY_MS']);
     useEffect(() => {
         let ready = true;
 
@@ -310,7 +310,7 @@ const TripDetails = () => {
         {isReservationFailed ? <InfoToast variant="danger" content={"Reserving trip failed"} onClose={toggleIsReservationFailed} /> : null}
         {isReservationSucceeded ? <InfoToast variant="success" content={"Trip has been reserved successfully"} /> : null}
         {isSelectingFailed ? <InfoToast variant="danger" content={"Please select room and food before making reservation"} onClose={toggleIsSelectingFailed} /> : null}
-        <ToastContainer className="m-3" position="top-end" style={{zIndex: 69}}>
+        <ToastContainer className="m-3 position-fixed" position="top-end" style={{zIndex: 69}}>
         { notifications ? 
             notifications.map((notification, idx) => (
                 <NotificationToast variant="warning" content={notification.notification} key={idx} />
