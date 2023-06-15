@@ -15,8 +15,11 @@ class TOLatestUpdates:
             "time": current_time,
             "event": event
         }
+        self.latest_updates.reverse()
         self.latest_updates.append(new_update)
-        self.latest_updates = sorted(self.latest_updates, key=lambda update: update["time"])
+        # self.latest_updates = sorted(self.latest_updates, key=lambda update: update["time"])
         if len(self.latest_updates) > self.latest_updates_number:
             self.latest_updates = self.latest_updates[-10:]
+        self.latest_updates.reverse()
+
         print("Latest updates number: " + str(len(self.latest_updates)))

@@ -6,6 +6,7 @@ import useFetch from "../hooks/useFetch";
 import UrlBuilder from "../components/UrlBuilder";
 import InfoToast from "../components/InfoToast";
 import NotificationToast from "../components/NotificationToast";
+import { ToastContainer } from "react-bootstrap";
 
 
 const exampleTrips = {
@@ -53,7 +54,7 @@ const TripsList = () => {
     let {data, isPending, error} = useFetch(url.href);
     // data = exampleTrips.trips;
     
-    let [notifications, setNotifications] = useState(() => null);
+    let [notifications, setNotifications] = useState(() => []);
     const notifyDelay = 2*1000;
     useEffect(() => {
         let ready = true;
@@ -67,8 +68,9 @@ const TripsList = () => {
 
             try{
                 const notify = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_DESTINATION_NOTIFICATIONS')+'?destination='+urlParams.get('destination'));
-                let notifyResponse = await notify.json();
-                setNotifications(notifyResponse.responseText);
+                if(notify.status === 200) {
+                    setNotifications(await notify.json());
+                }
             } catch {
                 setNotifications([{notification: 'Could not parse notification :('}]);
             } finally {
@@ -100,13 +102,15 @@ const TripsList = () => {
                 ))
             }
 
+            <ToastContainer className="m-3" position="top-end" style={{zIndex: 69}}>
             { notifications ? 
-                notifications.map((notification) => (
-                    <NotificationToast variant="warning" content={notification.notification} />
+                notifications.map((notification, idx) => (
+                    <NotificationToast variant="warning" content={notification.notification} key={idx} />
                 )) 
             : 
-            null
+                null
             }
+            </ToastContainer>
         </div>
     )
     

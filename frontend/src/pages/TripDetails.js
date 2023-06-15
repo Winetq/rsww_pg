@@ -9,7 +9,7 @@ import {
     faPlaneArrival, faClock, faSignature, faRightLong, faCircleInfo,
     faUtensils, faBed, faCircleNotch
 } from "@fortawesome/free-solid-svg-icons";
-import { Button } from "react-bootstrap";
+import { Button, ToastContainer } from "react-bootstrap";
 import TripRoomsElement from "../components/TripRoomsElement";
 import TripFoodElement from "../components/TripFoodElement";
 import InfoToast from "../components/InfoToast";
@@ -90,7 +90,7 @@ const TripDetails = () => {
     const {user} = useContext(AuthContext);
     let [room, setRoom] = useState(null);
     let [food, setFood] = useState(null);
-    let [reserved, setReserved] = useState(() => checkReservation());
+    let [reserved, setReserved] = useState(false);
     let [isReserving, setIsReserving] = useState(false);
 
     let [isSelectingFailed, setIsSelectingFailed] = useState(false);
@@ -116,22 +116,22 @@ const TripDetails = () => {
         let request = new XMLHttpRequest();
         request.open('POST', urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+"/"+id+'/reserve', true);
         request.addEventListener('load', (event) => {
-            if(event.currentTarget.statusCode !== 202){
+            if(event.currentTarget.status !== 202){
                 setIsReservationFailed(true);
             } else {
-                let reservations = sessionStorage.getItem('reservations');
-                if(reservations == null)
-                    reservations = [];
-                else
-                    reservations = JSON.parse(reservations);
+                // let reservations = sessionStorage.getItem('reservations');
+                // if(reservations == null)
+                //     reservations = [];
+                // else
+                //     reservations = JSON.parse(reservations);
                 
-                reservations.push({
-                    tripId: id,
-                    trip: data,
-                    room: room,
-                    food: food
-                });
-                sessionStorage.setItem('reservations', JSON.stringify(reservations));
+                // reservations.push({
+                //     tripId: id,
+                //     trip: data,
+                //     room: room,
+                //     food: food
+                // });
+                // sessionStorage.setItem('reservations', JSON.stringify(reservations));
 
                 setReserved(true);
                 setIsReservationSucceeded(true);
@@ -165,8 +165,9 @@ const TripDetails = () => {
             
             try{
                 const notify = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TRIPS_URL')+`/${id}/notifications`);
-                let notifyResponse = await notify.json();
-                setNotifications(notifyResponse.responseText);
+                if(notify.status === 200) {
+                    setNotifications(await notify.json());
+                }
             } catch {
                 setNotifications([{notification: 'Could not parse notification :('}]);
             } finally {
@@ -204,7 +205,11 @@ const TripDetails = () => {
                     :
                         <Button variant="success w-100" onClick={handleClickReserveTrip} className={reserved ? "disabled" : ""}>
                             <FontAwesomeIcon icon={faSignature} className="fa-fw me-1" />
-                            Reserve This Trip
+                            {isReservationSucceeded ?
+                                "Reserved"
+                            :
+                                "Reserve This Trip"
+                            }
                         </Button>
                 }                    
                 </div>
@@ -295,23 +300,25 @@ const TripDetails = () => {
                     <FontAwesomeIcon icon={faBed} className="fa-fw me-2 bg-success p-2 rounded text-white" />
                     <div className="my-auto">Rooms</div>
                 </div>
-                <div className="row row-cols-1 row-cols-lg-4 gx-3 gy-2">
-                    {data.hotel.rooms.map((room) => (
-                        <TripRoomsElement room={room} setRoom={setRoom} key={room.key}/>
+                <div className="row row-cols-1 row-cols-lg-3 gy-2 g-0">
+                    {data.hotel.rooms.map((room, idx) => (
+                        <TripRoomsElement room={room} setRoom={setRoom} key={idx}/>
                     ))}
                 </div>
             </div>
         </div>
         {isReservationFailed ? <InfoToast variant="danger" content={"Reserving trip failed"} onClose={toggleIsReservationFailed} /> : null}
-        {isReservationSucceeded ? <InfoToast variant="success" content={"Trip has been reserved"} onClose={toggleIsReservationSucceeded} /> : null}
+        {isReservationSucceeded ? <InfoToast variant="success" content={"Trip has been reserved successfully"} /> : null}
         {isSelectingFailed ? <InfoToast variant="danger" content={"Please select room and food before making reservation"} onClose={toggleIsSelectingFailed} /> : null}
+        <ToastContainer className="m-3" position="top-end" style={{zIndex: 69}}>
         { notifications ? 
-                notifications.map((notification) => (
-                    <NotificationToast variant="warning" content={notification.notification} />
-                )) 
+            notifications.map((notification, idx) => (
+                <NotificationToast variant="warning" content={notification.notification} key={idx} />
+            )) 
         : 
-        null
+            null
         }
+        </ToastContainer>
         </div>
     )
 }

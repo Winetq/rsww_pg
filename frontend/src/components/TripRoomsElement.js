@@ -10,7 +10,8 @@ const TripRoomsElement = ({room, setRoom}) => {
     }
 
     return (
-        <div className="room col border rounded mx-2 g-0">
+        <div className="room col g-3">
+        <div className="border rounded">
             <div className="w-100">
                 <input 
                     type="radio" 
@@ -40,6 +41,7 @@ const TripRoomsElement = ({room, setRoom}) => {
                     </ul>
                 </div>
             </div>
+        </div>
         </div>
     )
 }

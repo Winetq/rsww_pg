@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPeopleGroup, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faPeopleGroup, faMagnifyingGlass, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 
 import TripDestinationInput from "../components/TripDestinationInput";
 import TripDateInput from "../components/TripDateInput";
@@ -88,29 +88,38 @@ const Home = () => {
             setFunction(newValue);
     }
 
-    let [TOUpdates, setTOUpdates] = useState(null);
+    let [TOUpdates, setTOUpdates] = useState([]);
+    let [isToUpdatessPending, setIsTOUpdatesPending] = useState(false);
+    let ready = true;
+
     const updatesDelay = 2*1000;
-    useEffect(() => {
-        let ready = true;
+    const updateTOLatestUpdates = async () => {
+        if(!ready)
+            return;
 
-        const updateInterval = setInterval(async () => {
-            if(!ready)
-                return;
-
-            setTOUpdates([]);
-            ready = false;
-            
-            try{
-                const update = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TO_LATEST_UPDATES'));
-                let updatesResponse = await update.json();
-                setTOUpdates(updatesResponse.responseText);
-            } catch {
-                ;
-            } finally {
-                ready = true;
-            }
-        }, updatesDelay);
+        ready = false;
         
+        try{
+            setIsTOUpdatesPending(true);
+            const update = await fetch(urlBuilder.build('REACT_APP_API_ROOT_URL', 'REACT_APP_API_TO_LATEST_UPDATES'));
+            if(update.status === 200) {
+                let updatesResponse = await update.json();
+                setTOUpdates(updatesResponse);
+            }
+        } catch {
+            ;
+        } finally {
+            setIsTOUpdatesPending(false);
+            ready = true;
+        }
+    }
+
+    useEffect(() => {
+        const updateInterval = setInterval(async () => {
+            updateTOLatestUpdates();
+        }, updatesDelay);
+        updateTOLatestUpdates();
+
         return () => clearInterval(updateInterval);
     }, []);
 
@@ -165,9 +174,19 @@ const Home = () => {
                 />                
             </Form>
 
-            <div className="fw-bold fs-3 mb-3 border-bottom pb-1 text-info">
-                10 latest changes of Tour Operator
+            <div className="d-flex justify-content-between w-100 mb-3 border-bottom pb-1 fs-3 text-info">
+                <div className="fw-bold">
+                    10 latest changes of Tour Operator
+                </div>
+                <div className="my-auto">
+                { isToUpdatessPending ?
+                    <FontAwesomeIcon icon={faCircleNotch} className="fa-fw fa-spin" />
+                :
+                    null
+                }
+                </div>
             </div>
+            
             <div className="mt-2">
                 {TOUpdates ?
                     <LatestTOUpdatesTable updates={TOUpdates} />

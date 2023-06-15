@@ -24,8 +24,8 @@ const LatestTOUpdatesTable = ({ updates }) => {
                 </tr>
             </thead>
             <tbody>
-                {updates.map((update) => (
-                    <tr>
+                {updates.map((update, idx) => (
+                    <tr key={idx}>
                         <td>{update.time}</td>
                         <td>{update.event}</td>
                     </tr>
