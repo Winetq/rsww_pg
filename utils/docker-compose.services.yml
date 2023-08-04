@@ -2,42 +2,22 @@ version: "3.8"
 
 services:
 
-  rabbitmq:
-    container_name: 'rabbitmq'
-    image: rabbitmq:3.8-management-alpine
-    ports:
-      - 15672:15672
-      - 5672:5672
-
   transport-commands:
     build:
       context: ../transport_service_commands/
       dockerfile: Dockerfile
     container_name: 'transport-commands'
     restart: always
-    depends_on:
-      - rabbitmq
-      - postgres-db
     environment:
       - POSTGRES_USR=admin
       - POSTGRES_PWD=admin
       - POSTGRES_HOST=postgres-db
-      - POSTGRES_DATABASE=rsww
+      - POSTGRES_DATABASE=transport_commands_db_175132
       - POSTGRES_PORT=5432
       - RABBIT_HOST=rabbitmq
       - RABBIT_PORT=5672
       - RABBIT_USR=guest
       - RABBIT_PWD=guest
-
-  postgres-db:
-    container_name: 'postgres-db'
-    image: postgres
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: rsww
-    ports:
-      - 5432:5432
 
   transport-queries:
     build:
@@ -45,29 +25,16 @@ services:
       dockerfile: Dockerfile
     container_name: 'transport-queries'
     restart: always
-    depends_on:
-      - rabbitmq
-      - mongo-db
     environment:
       - MONGO_USER=admin
       - MONGO_PWD=admin
       - MONGO_HOST=mongo-db
-      - MONGO_DATABASE=rsww
+      - MONGO_DATABASE=175132_transport_queries_db
       - MONGO_PORT=27017
       - RABBIT_HOST=rabbitmq
       - RABBIT_PORT=5672
       - RABBIT_USR=guest
       - RABBIT_PWD=guest
-
-  mongo-db:
-    container_name: 'mongo-db'
-    image: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-      MONGO_INITDB_DATABASE: rsww
-    ports:
-      - 27017:27017
 
   api-gateway:
     build:
@@ -82,7 +49,7 @@ services:
       - RABBIT_PORT=5672
       - RABBIT_USR=guest
       - RABBIT_PWD=guest
-      - TIMEOUT=3
+      - TIMEOUT=2
 
   userservice:
     container_name: 'userservice'
@@ -93,11 +60,8 @@ services:
       - DB_HOST=postgres-db
       - DB_USER=admin
       - DB_PASSWORD=admin
-      - DB_NAME=rsww
+      - DB_NAME=userservice_db_175132
       - AMQP_HOST=rabbitmq
-    depends_on:
-      - rabbitmq
-      - postgres-db
 
   frontend:
     container_name: 'frontend'
@@ -115,21 +79,16 @@ services:
     environment:
       - AMQP_URL=rabbitmq
       - REJECTION_PROBABILITY=10
-    depends_on:
-      - rabbitmq
 
   accommodation_service_commands:
     container_name: accommodation_service_commands
     build:
       context: ../accommodation_service_commands
       dockerfile: Dockerfile
-    depends_on:
-      - rabbitmq
-      - postgres-db
     environment:
       - POSTGRES_HOST=postgres-db
       - POSTGRES_PORT=5432
-      - POSTGRES_DATABASE=accommodation_service
+      - POSTGRES_DATABASE=accommodation_service_commands_db_175132
       - POSTGRES_USER=admin
       - POSTGRES_PWD=admin
       - RABBIT_HOST=rabbitmq
@@ -142,14 +101,11 @@ services:
       context: ../accommodation_service_queries
       dockerfile: Dockerfile
     container_name: accommodation_service_queries
-    depends_on:
-      - rabbitmq
-      - mongo-db
     environment:
       - MONGO_USER=admin
       - MONGO_USER_PWD=admin
       - MONGO_HOST=mongo-db
-      - DATABASE_NAME=trips
+      - DATABASE_NAME=175132_accommodation_service_queries_db
       - MONGO_PORT=27017
       - RABBIT_HOST=rabbitmq
       - RABBIT_PORT=5672
@@ -161,14 +117,11 @@ services:
     build:
       context: ../trip_service
       dockerfile: Dockerfile
-    depends_on:
-      - rabbitmq
-      - mongo-db
     environment:
       - MONGO_USER=admin
       - MONGO_USER_PWD=admin
       - MONGO_HOST=mongo-db
-      - DATABASE_NAME=trips
+      - DATABASE_NAME=175132_trip_service_db
       - MONGO_PORT=27017
       - RABBIT_HOST=rabbitmq
       - RABBIT_PORT=5672
@@ -180,8 +133,6 @@ services:
     build:
       context: ../tour_operator
       dockerfile: Dockerfile
-    depends_on:
-      - rabbitmq
     environment:
       - AMQP_URL=rabbitmq
       - REJECTION_PROBABILITY=10
